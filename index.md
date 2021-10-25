@@ -52,8 +52,9 @@ Kodutöö ...
 ## Koolitaja
 
 ![](pic.jpg)
-Kaur Lumiste
-
-Lektor [@UnitTartu](https://www.ut.ee) & Andmeteadlane [@Salv](https://www.salv.com)
-kaur.lumiste [at] ut.ee 
-kaur [at] salv.com
+Kaur Lumiste<br>
+---<br>
+Lektor [@UnitTartu](https://www.ut.ee)<br>
+Andmeteadlane [@Salv](https://www.salv.com)<br>
+kaur.lumiste [at] ut.ee <br>
+kaur [at] salv.com<br>
