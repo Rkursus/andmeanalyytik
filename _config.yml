@@ -1,0 +1,24 @@
+# Permalinks
+#permalink:        pretty
+
+# Theme
+theme:            jekyll-theme-minimal
+
+# Setup
+title:            "Statistilised meetodid praktilises elus"
+tagline:          "Andmeanalüütiku arenguprogramm"
+url:              http://rkursus.github.io/
+paginate:         1
+baseurl:          /andmeanalyytik
+author:
+  name:           Kaur Lumiste
+  url:            
+  email:          kaur.lumiste@ut.ee
+
+# Custom vars
+version:          1.0.0
+github:
+  repo:           http://rkursus.github.io/andmeanalyytik
+
+pages_list:       
+  Lisamaterjal: '/lisamaterjal'

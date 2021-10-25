@@ -1,0 +1,178 @@
+---
+title: "Klientide segmenteerimine"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ettevalmistused
+
+Kui soovid koolitust oma arvutiga kaasa teha, siis esmalt paigalda Rstudios järgmised paketid. Vaikimisi seadistustega laetakse need sulle alla ja paigaldatakse automaatselt. Kuna mitmed paketid kasutavad veel omakorda lisapakette, siis võib juhtuda, et sinu arvutisse paigaldatakse palju rohkem pakette kui allolevas koodis kirjas.
+
+```{r eval = F}
+install.pacakges('readxl')
+install.packages('dplyr')
+#install.packages('ggplot2')
+
+# Ja laeme paketid töömällu järgmiselt
+library(readxl)
+library(dplyr)
+#library(ggplot2)
+```
+
+```{r echo = F, message = F}
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(dplyr))
+```
+
+
+
+```{r eval = F, echo = F}
+# Töökausta seadistamine - 
+#    töökaustaks seatakse automaatselt kaust kus asub käesolev fail
+install.packages('rstudioapi')
+setwd(dirname(rstudioapi::getActiveDocumentContext()[[2]]))
+```
+
+
+## Sissejuhatus
+
+Klientide segmenteerimiseks (või ükskõik milliste andmete lahterdamiseks) kasutame k-keskmiste meetodit (_k-means_). Käime läbi järgmised etapid:
+
+* Andmetega tutvumine
+* Andmete puhastamine
+* Andmete rikastamine
+* Uute andmete eraldamise, agregeerime
+* Teostame segmenteerimise
+* Analüüsime tulemusi
+
+Näidis analüüsi tegemiseks kasutame vabalt kättesaadavat andmestikku [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/online+retail#) veebilehelt, mis on omakorda saanud andmed [Chen, Sain & Guo (2012)](https://link.springer.com/article/10.1057/dbm.2012.17) artiklist. 
+
+Andmesikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1. detsember 2010 - 9.  detsember 2011. Veebipoes müüakse enamasti igasugusteks puhkudeks kingitusi ja paljud veebipoe kliendid on jae- või hulgimüüjad. Veebipood tegutseb rahvusvaheliselt aga suur enamus klientuurist on pärit Suurbritanniast.
+
+Andmestiku saate sisse laadida järgmise käsu abil:
+
+```{r}
+library(readxl)
+jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
+     col_types = c("text", "text", "text", 
+          "numeric", "date", "numeric", "text", 
+          "text"))
+
+
+```
+
+## Andmeväljad ja andmestikuga tutvumine
+
+Kui andmestikuga kaasa tulnud tunnuste kirjeldused on järgmised:
+
+* arve_nr - Arve number. Nominaalne tunnus, 6-kohaline arv, mis on iga tehingu puhul unikaalne. Kui kood algab 'c' tähega, siis indikeerib see tühistatud tehingut.
+* kood - Toote või kauba kood. Nominaalne tunnus, 5-kohaline unikaalne number iga toote kohta.
+* kirjeluds - Toote või kauba kirjeldus. Nominaalne tunnus.
+* kogus - Iga toote või kauba kogus, mis osteti käesoleval tehingul. Numbriline tunnus.
+* ostu_kp - Tehingu toimumise kuupäev ja kellaaeg.
+* yhiku_hind - Toote või kauba ühiku hind. Numbriline, valuuta GBP.
+* kliendi_id - Unikaalne kliendi ID. Nominaalne tunnus, 5-kohaline number.
+* riik - riigi nimi. Nominaalne tunnus, riik, kus klient resideerub.
+
+Veendumaks, et tõepoolest on kõik tunnused olemas ning uurimaks andmete sisu, siis käivita järgmised käsud. Mida teevad käsud `head()`, `str()` ja `summary()`?
+
+```{r}
+head(jaemyyk)
+str(jaemyyk)
+summary(jaemyyk)
+```
+
+Kas neid väljavõtteid vaadates tekkis mõni küsimus, mida sooviks lähemalt uurida? Näiteks milline on numbriliste väljade jaotus? Mis riikidest on veebipoe kliendid pärit?
+
+Kui eelnevast ei piisanud võib andmeid edasi uurida järgmise väga põhjaliku raporti abil:
+
+```{r eval = F}
+library(DataExplorer)
+DataExplorer::create_report(jaemyyk)
+```
+
+
+# Andmete puhastamine
+
+Eelnevast andmetega tutvumisest selgus, et paljud andmepunktid on ebaloogilised või ebavajalikud. Kui ise töötate juba pikemat aega andmeanalüütikuna ühes ja samas ettevõttes, siis on tihti anomaaliate põhjused teada. Kui aga andmestik on täiesti uus, siis tuleks ebaloogiliste andmete põhjused välja uurida. 
+
+Kui tegemist on vigase sisestusega (nt hind sisestati käsitsi ja sisestamisel koma jäi sisestamata), siis tuleks sellised andmed välja jätta või ära parandada kui võimalik.
+
+Kui aga on tegemist erindiga, siis on otsustuskoht, kas erindid sisse jätta või minema visata.
+
+Puhastame andmestiku:
+
+```{r}
+jaemyyk <- jaemyyk %>% 
+  filter(!is.na(kliendi_id), # tehingud millel puudub kliendi ID
+         kogus > 0,          # ainult kogus > 0
+         yhiku_hind > 0,     # Ühiku hind olgu alati positiivne
+         substr(arve_nr,1,1) != 'C', # Eemaldame tühistatud tehingud
+         kogus < 3000,       # Ebamõistlikult suured kogused
+         yhiku_hind < 3000   # Väga kallid tooted jätame kõrvale
+         )
+
+summary(jaemyyk)
+```
+
+# Rikastame andmeid
+
+```{r}
+jaemyyk <- jaemyyk %>% 
+  mutate(myyk = yhiku_hind * kogus,
+         ostukuu = months(ostu_kp))
+```
+
+# Agregeerime klientide andmed
+
+```{r}
+kliendid <- jaemyyk %>% 
+  group_by(kliendi_id) %>% 
+  summarise(kogu_myyk = sum(myyk),
+            tehinguid = length(unique(arve_nr)),
+            kesk_ost = kogu_myyk / tehinguid)
+
+```
+
+
+# Segmenteerimine
+
+```{r}
+skaleeritud <- kliendid %>% 
+  mutate(kogu_myyk = rank(kogu_myyk, ties.method = 'first'),
+         tehinguid = rank(tehinguid, ties.method = 'first'),
+         kesk_ost = rank(kesk_ost, ties.method = 'first')) %>% 
+  select(-kliendi_id) %>% 
+  scale() 
+
+k = 1:20
+pr = 1
+for (i in 2:20){
+km = kmeans(skaleeritud,i)
+pr[i] = km$tot.withinss/km$totss
+}
+
+plot(k,pr,type="b")
+
+
+klaster = kmeans(skaleeritud,4)
+klaster$centers
+
+library(corrplot)
+corrplot(klaster$centers, is.corr=F)
+
+kliendid$kliendi_id[klaster$cluster == 1]
+kliendid$kliendi_id[klaster$cluster == 2]
+```
+
+```{r}
+plot(skaleeritud[,1], skaleeritud[,2], col = klaster$cluster, pch = 20)
+plot(skaleeritud[,2], skaleeritud[,3], col = klaster$cluster, pch = 20)
+plot(skaleeritud[,1], skaleeritud[,3], col = klaster$cluster, pch = 20)
+```
+
+
+
