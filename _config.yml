@@ -5,8 +5,8 @@
 theme:            jekyll-theme-minimal
 
 # Setup
-title:            "Statistilised meetodid praktilises elus"
-tagline:          
+title:            "7. õppepäev Statistilised meetodid praktilises elus"
+tagline:          "Andmeanalüütiku arenguprogramm"
 url:              http://rkursus.github.io/
 paginate:         1
 baseurl:          /andmeanalyytik

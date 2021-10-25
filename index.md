@@ -6,8 +6,6 @@ layout: frontpage
  {% include banner.html %}
 </div>
 
-# Andmeanalüütiku arenguprogrammi 7. õppepäev - Statistilised meetodid praktilises elus
-
 ## Õppepäeva lühikirjeldus
 
 Õppepäeva eesmärk on tutvustada andmete analüüsimise praktilist käiku kahe näite varal. Alustame toorandmete analüüsiga, puhastame need ning vajadusel rikastame lisa andmeväljadega. Seejärel valime sobilikud andmeanalüüsimeetodid, et vastata meid huvitavatele küsimustele. Üldine eesmärk on andmete efektiivne kasutamine ehk kuidas saada andmetest praktilist kasu - Kuidas saada andmetest väärtuslikku teavet?
