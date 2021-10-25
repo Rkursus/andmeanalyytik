@@ -6,8 +6,9 @@ layout: frontpage
  {% include banner.html %}
 </div>
 
+# Andmeanalüütiku arenguprogrammi 7. õppepäev - Statistilised meetodid praktilises elus
 
-# Õppepäeva lühikirjeldus
+## Õppepäeva lühikirjeldus
 
 Õppepäeva eesmärk on tutvustada andmete analüüsimise praktilist käiku kahe näite varal. Alustame toorandmete analüüsiga, puhastame need ning vajadusel rikastame lisa andmeväljadega. Seejärel valime sobilikud andmeanalüüsimeetodid, et vastata meid huvitavatele küsimustele. Üldine eesmärk on andmete efektiivne kasutamine ehk kuidas saada andmetest praktilist kasu - Kuidas saada andmetest väärtuslikku teavet?
 
@@ -43,7 +44,7 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 
 Kodutöö ...
 
-# Asjume asja kallale
+## Asjume asja kallale
 
 * [Klientide segmenteerimine](teema1)
 	* [R kood](https://raw.githubusercontent.com/Rkursus/andmeanalyyik/master/_teema1/teema1_r_kood.R)
