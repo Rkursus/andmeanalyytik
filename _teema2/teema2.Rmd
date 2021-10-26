@@ -54,11 +54,15 @@ Kontrollime mudeli prognoosivõimet – kui hästi ta on varem suutnud tulevikku
 plot(m1)
 ```
 
-Prognoosime leitud mudeli abil kaks aastat (24 kuud) tulevikku:
+Prognoosime aga esmalt veendu, et sul oleks `forecast` pakett paigaldatud ja töömällu loetud:
+```{r eval = F}
+install.packages('forecast')
+library(forecast)
+```
+
+Prognoosime leitud mudeli abil kaks aastat (24 kuud) tulevikku
 
 ```{r}
-library(forecast)
-
 prog = forecast(m1, h=24)
 prog
 
@@ -111,12 +115,6 @@ Põhiliseks kasutusvaldkonnaks on lühiajaline prognoosimine:
 * makroökonoomika aegread
 * finantsaegread
 * ettevõtluses nõudlus
-
-Esmalt veendu, et sul oleks `forecast` pakett paigaldatud ja töömällu loetud:
-```{r eval = F}
-install.packages('forecast')
-library(forecast)
-```
 
 
 R-is on kindel abimees funktsioon `auto.arima()`

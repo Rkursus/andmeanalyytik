@@ -45,9 +45,9 @@ Kodutöö ...
 ## Asjume asja kallale
 
 * [Klientide segmenteerimine](teema1)
-	* [R kood](https://raw.githubusercontent.com/Rkursus/andmeanalyyik/master/_teema1/teema1_r_kood.R)
-* Tuleviku prognoosimine
-	* R kood
+	* [R kood](https://raw.githubusercontent.com/Rkursus/andmeanalyytik/master/_teema1/teema1_r_kood.R)
+* [Tuleviku prognoosimine](teema2)
+	* [R kood](https://raw.githubusercontent.com/Rkursus/andmeanalyytik/master/_teema2/teema2_r_kood.R)
 
 ## Koolitaja
 

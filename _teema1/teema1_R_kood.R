@@ -2,7 +2,7 @@
 # 7. õppepäev
 # Statistilised meetodid praktilises elus
 #
-# Klientide segmenteerimine"
+# Klientide segmenteerimine
 # Autor: Kaur Lumiste
 
 
