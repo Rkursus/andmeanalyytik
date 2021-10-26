@@ -14,17 +14,18 @@ Kui soovid koolitust oma arvutiga kaasa teha, siis esmalt paigalda Rstudios jär
 ```{r eval = F}
 install.pacakges('readxl')
 install.packages('dplyr')
-#install.packages('ggplot2')
+install.packages('corrplot')
 
 # Ja laeme paketid töömällu järgmiselt
 library(readxl)
 library(dplyr)
-#library(ggplot2)
+library(corrplot)
 ```
 
 ```{r echo = F, message = F}
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(corrplot))
 ```
 
 
@@ -87,7 +88,7 @@ summary(jaemyyk)
 
 Kas neid väljavõtteid vaadates tekkis mõni küsimus, mida sooviks lähemalt uurida? Näiteks milline on numbriliste väljade jaotus? Mis riikidest on veebipoe kliendid pärit?
 
-Kui eelnevast ei piisanud võib andmeid edasi uurida järgmise väga põhjaliku raporti abil:
+Kui eelnevast ei piisanud võib andmeid edasi uurimiseks genereerida järgmise väga põhjaliku raporti:
 
 ```{r eval = F}
 library(DataExplorer)
@@ -95,13 +96,13 @@ DataExplorer::create_report(jaemyyk)
 ```
 
 
-# Andmete puhastamine
+## Andmete puhastamine
 
 Eelnevast andmetega tutvumisest selgus, et paljud andmepunktid on ebaloogilised või ebavajalikud. Kui ise töötate juba pikemat aega andmeanalüütikuna ühes ja samas ettevõttes, siis on tihti anomaaliate põhjused teada. Kui aga andmestik on täiesti uus, siis tuleks ebaloogiliste andmete põhjused välja uurida. 
 
-Kui tegemist on vigase sisestusega (nt hind sisestati käsitsi ja sisestamisel koma jäi sisestamata), siis tuleks sellised andmed välja jätta või ära parandada kui võimalik.
+Kui tegemist on vigase sisestusega (nt hind sisestati käsitsi ja koma jäi kahe silma vahele), siis tuleks sellised andmed välja jätta või ära parandada kui võimalik.
 
-Kui aga on tegemist erindiga, siis on otsustuskoht, kas erindid sisse jätta või minema visata.
+Kui aga on tegemist erindiga, siis on otsustuskoht, kas erindid sisse jätta või minema visata. Hetkel viskame erindid ja ebaloogilised väärtused välja, sest ei ole võimalik nende põhjust välja uurida ning need võivad segmenteerimist segama hakata.
 
 Puhastame andmestiku:
 
@@ -118,61 +119,149 @@ jaemyyk <- jaemyyk %>%
 summary(jaemyyk)
 ```
 
-# Rikastame andmeid
+## Rikastame andmeid
+
+Esialgne andmestik ei pruugi kogu informatsiooni sisaldada, seega tuleks alati vaadata, kas saab uusi tunnuseid lisada, mis teevad analüüsi sisukamaks. Hetkel ei anna toote ühiku hind ja ostetud toote kogus piisavat infot kliendi käitumisest. Leiame ostu summa ja kuupäevad on alati hea infoallikas tegemaks keerukamaid analüüse - kuu vs kuu muutus, sessoonsus, tunnuste ajaline sõltuvus jpm.
 
 ```{r}
+# Rikastame andmeid
 jaemyyk <- jaemyyk %>% 
   mutate(myyk = yhiku_hind * kogus,
          ostukuu = months(ostu_kp))
 ```
 
-# Agregeerime klientide andmed
+## Agregeerime klientide andmed
+
+Jällegi ei pruugi toorandmed olla meie küsimustele vastamiseks piisavad. Hetkel huvitab meid klienditaseme info, mitte tehingu taseme info. Peame agregeerima, selleks grupeerime andmed esmalt kliendi kaupa:
 
 ```{r}
 kliendid <- jaemyyk %>% 
   group_by(kliendi_id) %>% 
-  summarise(kogu_myyk = sum(myyk),
-            tehinguid = length(unique(arve_nr)),
-            kesk_ost = kogu_myyk / tehinguid)
+  summarise(kaive = sum(myyk),
+            tehinguid = length(unique(arve_nr)), # unikaalsete tehingute arv
+            kesk_ost = kaive / tehinguid)
 
 ```
 
 
-# Segmenteerimine
+# Segmenteerimine k-keskmiste meetodi abil
+
+Segmenteerimiseks kasutame k-keskmiste meetodit (_k-means clustering_) mis püüab leida andmepunktide grupeeringuid - ja nagu nimi ütleb, siis keskpunktide kaudu.
+
+Näiteks olgu andmestikus pikkus, kaal ja sugu. Tekitades hajuvusdiagrammi ning värvides punktid soo järgi saame:
+
+![k-keskmiste näide](pilt1.png)
+
+Nagu näha, siis eristuvad mehed ja naised üsna hästi kaalu ja pikkus järgi. Aga oletame, et me ei tea sugu ja proovime statistiliste meetodite abil hinnata, kas õnnestub antud andmestik jagada kaheks. 
+
+K-keskmiste klasterdamise puhul on eesmärk jagada objekti _k_ klastrisse nii, et iga objekt kuuluks klastrisse mille keskpunkt on talle kõige lähedam. Antud juhul _k_ = 2 ja nagu näha, siis õnnestus objektide gruppeerimine üsna sarnaselt sellele, mida indikeerib sugu.
+
+![k-keskmiste näide](pilt2.png)
+
+Suuruse _k_ saame ise määrata, näitek _k_ = 3 puhul oleks tuelmus järgmine:
+
+![k-keskmiste näide](pilt3.png)
+
+Küll aga on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned ettevalmistused.
+
+## k-keskmiste klasterdamise ettevalmistused
+
+Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned esktreemsed väärtusd. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt `hist(kliendid$kaive`.
+
+Kuna keskmised on tugevalt mõjutatud ekstreemsete väärtuste poolt, siis tuleb nende mõju vähendada. Selleks on erinevaid andmete transformeerimisviise - nt logaritmimine. 
+
+Võrdle näiteks järgmisi jooniseid:
+
+```{r echo = F, figures-side, fig.show="hold", out.width="50%"}
+
+hist(kliendid$kaive, xlab = 'Käive',
+     main = 'Tunnuse "käive" histogramm',
+     ylab = 'sagedus')
+
+hist(log(kliendid$kaive), xlab = 'Logaritmitud käive',
+     main = 'Logaritmitud "käive" histogramm',
+     ylab = 'sagedus')
+
+
+```
+Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
+
+Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
+
+Kogu eelneva saame tehtud järgmiste käskudega:
 
 ```{r}
-skaleeritud <- kliendid %>% 
-  mutate(kogu_myyk = rank(kogu_myyk, ties.method = 'first'),
-         tehinguid = rank(tehinguid, ties.method = 'first'),
-         kesk_ost = rank(kesk_ost, ties.method = 'first')) %>% 
-  select(-kliendi_id) %>% 
-  scale() 
+# Skaleerime andmed
+kliendid <- kliendid %>% 
+  mutate(log_kaive = log(kaive),
+         log_tehinguid = log(tehinguid),
+         log_kesk_ost = log(kesk_ost))
 
+skaleeritud <- kliendid %>% 
+  select(log_kaive, log_tehinguid, log_kesk_ost) %>% 
+  scale() 
+```
+
+## Klastrite arvu _k_ määramine
+
+Kuna antud meetod tahab, et me annaksime klastrite arvu ette, siis kuidas teha seda andmetest lähtuvalt?
+
+Selleks saame kasutada "küünarnuki" meetodit (_elbow method_). Nimi on kentsakas aga tuleneb alloleva joonise kujust. Siin määratakse mitme klastriga toimub veel nö arvestatav "muutus" ehk millise klastrite arvu juures on klastrite keskpunktid üksteisest veel piisavalt kauged, et need eristaksid gruppe. Arvestatava "muutuse" määramine on tunnetuslik aga alloleval joonisel ütleks, et vasakult poolt pärast 4-ndat täppi suuremat langust enam ei toimu.
+
+```{r}
+# Eelnevad suurused, mis on vaja defineerida
 k = 1:20
 pr = 1
+
+# Proovime läbi kõik klasterdamised klastriarvuga 1st-20ni.
 for (i in 2:20){
-km = kmeans(skaleeritud,i)
-pr[i] = km$tot.withinss/km$totss
+  km = kmeans(skaleeritud,i)
+  pr[i] = km$tot.withinss/km$totss
 }
 
+# Küünarnuki joonis
 plot(k,pr,type="b")
-
-
-klaster = kmeans(skaleeritud,4)
-klaster$centers
-
-library(corrplot)
-corrplot(klaster$centers, is.corr=F)
-
-kliendid$kliendi_id[klaster$cluster == 1]
-kliendid$kliendi_id[klaster$cluster == 2]
 ```
+
+## Klientide segmenteerimine
+
+Olles teinud ära kogu eeltöö saame lõpuks leida klientide grupid. Funktsioon ise aga klastreid ei nimeta ega analüüsi, seega milliseid iseloomustavaid nimesid annaksid klastritele alloleva joonise järgi?
 
 ```{r}
-plot(skaleeritud[,1], skaleeritud[,2], col = klaster$cluster, pch = 20)
-plot(skaleeritud[,2], skaleeritud[,3], col = klaster$cluster, pch = 20)
-plot(skaleeritud[,1], skaleeritud[,3], col = klaster$cluster, pch = 20)
+# Klasterdamer ja leiame klastrite keskmised (ehk keskpunkti)
+klastrid = kmeans(skaleeritud,4)
+klastrid$centers
+
+# Joonis, mis hõlbustab analüüsimist
+corrplot(klastrid$centers, is.corr=F, main = 'Klastrite keskmised')
+```
+Võime veenduda oma tõlgendustes järgmiste abistavate jooniste abil:
+
+
+```{r}
+plot(kliendid$log_kaive, kliendid$log_tehinguid, col = klastrid$cluster, pch = 20,
+     xlab = 'Käive',
+     ylab = 'Tehingute arv',
+     main = 'Käibe ja tehingute arvu hajuvusdiagramm')
+
+plot(kliendid$log_tehinguid, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20,
+     xlab = 'Tehingute arv',
+     ylab = 'Keskmine ostusumma',
+     main = 'Tehingute arvu ja keskmise ostusumma hajuvusdiagramm')
+
+plot(kliendid$log_kaive, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20,
+     xlab = 'Käive',
+     ylab = 'Keskmine ostusumma',
+     main = 'Käibe ja keskmise ostusumma hajuvusdiagramm')
 ```
 
+Kui nüüd soovime teada millised kliendid kuuluvad teatud klastrisse (et siis vastavalt adresseerida või nt turundust suunata nendele), siis saame klientide ID-d eraldada järgmiste käskude abil:
+
+
+```{r eval = F}
+kliendid$kliendi_id[klastrid$cluster == 1] # 1. klastrisse kuuluvad kliendid
+kliendid$kliendi_id[klastrid$cluster == 2] # 2. klastrisse kuuluvad kliendid
+# jne
+```
 
 
