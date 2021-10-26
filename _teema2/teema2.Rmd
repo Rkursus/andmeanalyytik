@@ -1,390 +1,133 @@
 ---
-title: "Rakendustarkvara: R"
-output: 
-  html_document:
-    theme: null
-    number_sections: true
+title: "Tuleviku prognoosimine"
+output: html_document
 ---
 
+```{r echo = F}
+suppressPackageStartupMessages(library(forecast))
+```
 
 
+## Sissejuhatus aegridade analüüsi
 
-# Väärtuste tüübid. 
-<!--Nägime eespool `str(.)` käsku kasutades, et andmestiku veerud on erinevad tüüpi. Massachusettsi andmestikus oli erinevaid tüüpe kaks: `int` ja `Factor`.
--->
-
-Nagu eelmises teemas öeldud, siis vektori väärtused peavad olema kõik ühte tüüpi. R-is on väärtuste põhitüübid:
-
-* `int` / `integer` -- täisarvud (ka negatiivsed)
-* `numeric` -- reaalarvud
-* `cplx` / `complex` -- kompleksarvud
-* `char` / `character` -- sõned (tähemärgid ja muud tekstilised sümbolid, sisestamisel kasutada jutumärke)
-* `logical` -- tõeväärtused (ainult kaks väärtust: `TRUE` või `FALSE`)
-
-<!-- * `Factor` -- faktortunnus   Faktor on tegelikult mingi andmestruktuur-->
-
-Üht tüüpi väärtust saab  vahel teisendada teist tüüpi väärtuseks vastava `as.<tüübi_nimi>` käsuga (`as.integer`, `as.numeric`, `as.character` jne). Kontrollimaks mingi väärtuse tüüpi saab kasutada vastavat käsku `is.<tüübi_nimi>` (`is.integer`, `is.numeric`, `is.character` jne).
+Tavaline statistika aegridade puhul ei aita, sest aegridade puhul eiratakse ühte põhilist eeldust statistikas - vaatluste sõtlumatus. Selle tõttu võib tavastatistika mudel väga imelikke tulemusi anda:
 
 
-Eelmises teema juures moodustasime mõned vektorid. Tekitame need uuesti
+![](aegread3.png)
+
+## Holt-Winters'i meetod
+
+Proovime leida Holt-Winters’i meetodil Tallinki reisijate arvu prognoosi.
+
+Loeme sisse näiteandmed:
+
 ```{r}
-kaalud <- c(7, 3.5, 0.4, 2, 3.2, 20.2)
-liik <- c("koer", "kass", "rott", "kass", "kass", "koer")
-vanused <- c(7, NA, 3, 53, 53, 95)
+load(url("http://www.ms.ut.ee/mart/andmeteadus/reisijaid.RData"))
+head(Tallink)
+attach(Tallink)
 ```
-ja kontrollime väärtuste tüüpe:
-```{r} 
-is.integer(kaalud)
-is.numeric(kaalud)
-class(liik)
-class(vanused)
-```
-Eraldi käsk on ka puuduvate väärtuste esinemise kontrolliks:
+
+ja teisendame andmed aegreaks:
+
+
 ```{r}
-is.na(vanused)
+y=ts(reisijaid, start=c(2012,5), frequency=12)
+y
+plot(y)
 ```
+
+
+Järgnevalt hindame Holt-Winters’i mudeli. Sessoonsuse modelleerimisel kasutame multiplikatiivset mudelit – kas oskad aimata, miks?
+
 ```{r include=FALSE}
-anyNA(vanused)
+m1=HoltWinters(y, seasonal="mult")
+m1
 ```
 
 
-
-<!--
-The entities R operates on are technically known as objects. Examples are vectors of numeric
-(real) or complex values, vectors of logical values and vectors of character strings. These are
-known as “atomic” structures since their components are all of the same type, or mode, namely
-numeric, complex, logical, character and raw.
-Vectors must have their values all of the same mode. Thus any given vector must be unambiguously
-either logical, numeric, complex, character or raw.
--->
-
-### Ülesanded
-1. Kas tekstiväärtused saab teisendada arvudeks? Kontrolli vektorite `month.name` ja `x <- c(0:5,  "tekst", "T", 234.5, "234,5")` korral, kas need on tekstivektorid st kasuta funktsiooni `is.character(.)`. Seejärel vaata, mis on tulemuseks kui rakendad funktsiooni `as.numeric(.)` nendele vektoritele. 
-2. Miks annavad  käsud `is.integer(1:4)` ja `is.integer(c(1, 2, 3))` erineva tulemuse?
-3. Rakenda funktsiooni `is.na(.)` vektorile  `z <- c("a", "NA", NA, 0)`. Kas tulemus on oodatav?
+![](aegread1.png)
 
 
-```{r, eval = F, echo = F}
-# 1
-is.character(month.name)
-is.character(x)
-as.numeric(month.name)
-as.numeric(x)
-
-# 2
-is.integer(1:4)
-is.integer(c(1, 2, 3))
-
-
-# 3
-z <- c("a", "NA", NA, 0)
-
-is.na(z)
-```
-
-
-## Tõeväärtused ja tõeväärtusvektorid
-
-Kui käsuga `mean` kasutada argumenti `na.rm`, siis selle argumendi väärtus võib olla `TRUE` või `FALSE`. Tegemist on **tõeväärtustega** (ingl. k. _boolean_). Kuna tõeväärtustega saab teha **loogilisi tehteid** (ehk neid kombineerida), siis on neist kasu ka mujal kui `na.rm` argumendi väärtustamisel. 
-
-
-Loogilisi tehteid on kolm: korrutamine (`&`), liitmine (`|`) ja eitus (`!`). 
-
-tehe           |  tulemus
----------------------------|---------------
-TRUE \& TRUE   |  TRUE
-TRUE \& FALSE  |  FALSE
-FALSE \& TRUE  |  FALSE
-FALSE \& FALSE |  FALSE
----------------------------|---------------
-TRUE \| TRUE   |  TRUE
-TRUE \| FALSE  |  TRUE
-FALSE \| TRUE  |  TRUE
-FALSE \| FALSE |  FALSE
----------------------------|---------------
-!TRUE          |  FALSE
-!FALSE         |  TRUE
-
-Tõeväärtus on tulemuseks siis, kui võrdleme kahte objekti/väärtust omavahel.
-
-võrdlus        | sümbol        |  näide   
----------------|---------------|----------------
-võrdumine      |  `==`         |  `2 == 3` ; `"a" == "A"`
-mittevõrdumine |  `!=`         | `2 != 3` ; `"a" != "A"`
-väiksem kui    |  `<`          | `2 < 3` ; `"a" < "A"`
-väiksem või võrdne | `<=`      | `3 <= 2` ; `"a" <= "A"`
-suurem kui     |  `>`          | `3 > 2` ; `"a" > "A"`
-suurem või võrdne | `>=`       | `3 >= 2` ; `"a" >= "A"`
-
-Nagu ennist mainitud, siis R-is tehakse tehteid vektoritega elementhaaval. Seepärast ka siis, kui võtame mingi arvulise vektori ja võrdleme seda mingi arvuga, siis võrreldakse igat elementi eraldi ja tulemuseks on tõeväärtustest koosnev vektor, milles on sama palju elemente kui oli elemendiviisilisi võrdluseid. Sama kehtib ka juhul, kui võrreldakse muud tüüpi väärtuseid (näiteks tekstilisi väärtuseid). 
-```{r, eval=F}
-kaalud > 10
-vanused == 53
-liik == "kass"
-vanused == kaalud
-liik == "kass" | liik == "koer"
-```
-
-<!--
-Kui soovime mingit väärtust võrrelda `NA`-ga, et teada saada, kas tegemist on puuduva väärtusega või mitte, siis topeltvõrdusmärgid ei tööta, vaid tuleb kasutada käsku `is.na(.)`
+Kontrollime mudeli prognoosivõimet – kui hästi ta on varem suutnud tulevikku näha?
+	
 ```{r}
-vanused == NA
-is.na(vanused)
+plot(m1)
 ```
--->
 
-Mõnikord on soov kontrollida, kas mingi väärtus leidub etteantud hulgas. Siis on sobilik kasutada operaatorit `%in%` :
+Prognoosime leitud mudeli abil kaks aastat (24 kuud) tulevikku:
+
 ```{r}
-1:4 %in% c(2, 5)
-c(2, 5) %in% 1:4
+library(forecast)
+
+prog = forecast(m1, h=24)
+prog
+
+plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos")
 ```
 
-Tõeväärtuste puhul on huvitav see, et kui nendega tavalisi arve korrutada või liita vms, siis konverteeritakse tõeväärtused arvudeks: `TRUE` muutub arvuks 1 ja `FALSE` muutub arvuks 0.
+  
+Soovi korral võid mängida kunstnikku ja leida kõige meelepärasem graafik prognooside esitamiseks:
+
 ```{r}
-is.na(vanused) * 1
-sum(is.na(vanused))  # mitmel vaatlusalusel on vanus puudu
-```
+prog = forecast(m1, h=24, level=0.95)
+plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos")
 
-Konverteerimine toimib automaatselt. Kui on endal soov tõeväärtuseid arvuliseks muuta, saab rakendada käsku `as.numeric(.)` tõeväärtustega vektorile. Saab ka vastupidi: kui on soov arvusid tõeväärtusteks muuta, saab seda teha käsuga `as.logical(.)`. Proovi!
-
-### Ülesanded
-
-1. Tekita käsku `c(.)` kasutades viiest elemendist koosnev tõeväärtusvektor, sealjuures neljas element olgu `NA`. Konverteeri see vektor arvuliseks käsuga `as.numeric`. Missuguse arvulise väärtuse sai `NA`?
-1. Selgita välja, millised arvud konverteeritakse väärtuseks `TRUE` ja millised väärtuseks `FALSE`, kui kasutada käsku `as.logical`.
-1. Mis on loogiliste tehete tulemus, kui üks tehtes osalev väärtus on `NA`?
-1. Proovi läbi järgmised käsud `as.integer(c("tere", 0, 1, TRUE, FALSE))` ja `as.integer(c(0, 1, TRUE, FALSE))`  ning mõtle, miks väärtused `TRUE` ja `FALSE` teisendatakse neil juhtudel erinevalt.
-
-```{r, eval = F, echo = F, results='hide'}
-as.integer(c("tere", 0, 1, TRUE, FALSE))
-as.integer(c(0, 1, TRUE, FALSE))
-```
-
-<!-- 1. Mitu inimest töötab nädalas üle 40 tunni (tunnus `WKHP`)? Mitmel inimesel on töötundide arv puudu?-->
-
-
-# Andmestik, andmete import
-
-Tavaliselt koosnevad andmestikud ridadest ja veergudest (tulpadest), kus iga rida vastab mingile mõõtmisobjektile ja iga veerg vastab mingile mõõdetud omadusele (tunnusele). 
-
-```{r, echo = F,  fig.width = 5}
-vanused <- c(7, NA, 3, 53, 53, 95)
-kaalud <- c(7, 3.5, 0.4, 2, 3.2, 20.2)
-liik <- c("koer", "kass", "rott", "kass", "kass", "koer")
-D <- data.frame(liik, kaalud, vanused)
-
-
-par(cex = 0.9, mar = c(0, 0, 0, 0))
-plot(c(-1, 10), c(1, 12), type = "n", axes = F, xlab = "", ylab = "", xlim = c(0, 5), ylim = c(3, 11))
-x <- c(2, 3, 4)
-y <- seq(9, 2, -0.75)
-
-
-for (i in 1:6){
-  for(j in 1:3)
-text(x[j], y[i+2], D[i, j], adj = c(0.5, 0.5))
-  }
-
-for (i in 1:8)
-lines(c(1.5, 4.5), rep(mean(y[c(i, i+1)]), 2), col = "gray")
-
-rect(1.5, mean(y[8:9]), 4.5, mean(y[1:2]), border = 1, lwd = 2)
-rect(1.5,  mean(y[1:2]), 4.5, mean(y[2:3]), border = 1, lwd = 2, col = "gray")
-
-for(j in 1:3) text(x[j], y[2], names(D)[j], adj = c(0.5, 0.5), font=2)
-
-
-arrows(0, 6, 1.6, 6, code = 2, angle = 15)
-text(1, 6, "rida = objekt", adj = c(1, -1))
-
-arrows(3, 10.5, 3, 8.5, code = 2, angle = 15)
-text(3, 9.5, "veerg = tunnus", adj = c(-0.1, -1))
-
-
-
-
+prog = forecast(m1, h=24, level=c(0.5, 0.9, 0.95, 0.99))
+plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos", 
+  	shadecols=c("gray95", "gray85", "gray80", "gray75") )
 ```
 
 
+Ning võid lisada graafikule ka hiljem lisandunud reisijate arvud:
 
-
-Erinevad statistikaprogrammid kasutavad andmestike säilitamiseks eri failiformaate. Et andmestikke ühest programmist teise saada, on üheks võimalikuks lahenduseks andmetabel salvestada vahepeal tekstiformaadis failiks, näiteks `.txt` või `.csv` tüüpi failiks ja importida tekstifail. 
-
-MS Exceli faile ning statistikatarkvarade spetsiifilisi andmeformaate (nt Stata `.dta`, SPSS-i, `.sav`) ei saa R-i importida baaspaketi käskude abil. Selliste failide impordiks on vaja kasutada mõnda R-i lisapaketti. 
-
-Nüüd vaatame nii tekstifailis andmete kui ka mõne teise statistikaprogrammi andmefailide importimist R-i.
-
-
-## Andmete sisselugemine ja faili kirjutamine (tekstifail)
-
-Kõige olulisem käsk tekstikujul andmestike sisselugemiseks on `read.table()`. Sellel on mitmeid **argumente**, mille abil saab täpsustada erinevaid asjaolusid, mis antud andmestikku puutuvad:
-
-<!--
------------- | ------------
-`file`       | faili asukoht ja nimi koos faililaiendiga (peab olema jutumärkides)
-`header`     | kas faili esimeses reas on veerunimed? (TRUE = jah, FALSE = ei)
-`sep`        | millise sümboliga on veerud eraldatud? (nt `"\t"` - tabulaatori sümboliga)
-`dec`        | kuidas on märgitud kümnendmurru eraldaja? (nt `"."` või `","`)
-`quote`      | millega on tekstilised väärtused ümbritsetud? (nt `"\""` tähendab, et kahekordsete jutumärkidega)
-`na.strings`  | kuidas on puuduvad väärtused tähistatud?
-`fileEncoding`  | mis tähekodeeringut kasutatakse (Windowsis sageli `"latin9"`, Macis/Linuxis sageli `"utf8"`)
--->
-
-
---------------   -----   ------------------------------------------------------------------------------------------------------
-`file`             -     faili asukoht ja nimi koos faililaiendiga (peab olema jutumärkides)
-`header`           -     kas faili esimeses reas on veerunimed? (TRUE = jah, FALSE = ei)
-`sep`              -     millise sümboliga on veerud eraldatud? (nt `"\t"` - tabulaatori sümboliga)
-`dec`              -     kuidas on märgitud kümnendmurru eraldaja? (nt `"."` või `","`)
-`quote`            -     millega on tekstilised väärtused ümbritsetud? (nt `"\""` tähendab, et kahekordsete jutumärkidega)
-`na.strings`       -     kuidas on failis puuduvad väärtused tähistatud?
-`fileEncoding`     -     mis tähekodeeringut kasutatakse (Windowsis sageli `"latin9"`, Macis/Linuxis sageli `"utf8"`)
---------------   -----   ------------------------------------------------------------------------------------------------------
-
-
-Faili asukoht võib olla kõvakettal või võrgus. Kui käsu `setwd` abil on määratud, milline on käimasoleva töösessiooni **töökataloog**, ja andmefail on selles kataloogis, siis piisab käsule `read.table` ainult faili nime etteandmisest (täispikka asukohta ei pea andma). Windowsis on kombeks kaustastruktuuri tähistamiseks kasutada kurakaldkriipsu (tagurpidi kaldkriipsu) `\`, aga R-is on sellisel kaldkriipsul eriline tähendus -- sellega märgitakse, et järgneb erisümbol (nt `\t` on tabulaatori sümbol). Seepärast tuleb kataloogitee märkimisel kasutada kahekordseid kurakaldkriipse, näiteks:
-```{r,eval=FALSE}
-setwd("C:\\Users\\mina\\Rkursus\\")
-```
-Teine võimalus on kasutada tavalist kaldkriipsu, nagu MacOS-is ja Linuxites:
-```{r,eval=FALSE}
-setwd("C:/Users/mina/Rkursus/")
-```
-
-Andmete sisselugemisel tuleks anda andmetabelile nimi (salvestada see mingi objektina), vastasel juhul andmestik trükitakse lihtsalt ekraanile ja sellega enam midagi muud teha ei saa: `r load("../data/andmed.RData")` 
 ```{r}
-naide1 <- read.table("https://github.com/Rkursus/tykliinikum/raw/master/data/esimene.txt", 
-                     header = T, sep = "\t", dec = ",")
+plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos", 
+  	shadecols=c("gray95", "gray85", "gray80", "gray75") )
+tegelik=c(789272, 852609, 989445, 1223901, 993078, 730631, 785583, 
+			654240, 811261, 549278, 620006, 686488, 779113)
+teg=ts(tegelik, start=c(2018, 4), frequency=12)
+points(teg, col="red", pch=20, cex=2)
 ```
 
-Töökeskkonnas olevaid andmetabeleid saab faili kirjutada käsuga `write.table(.)`, andes käsule ette salvestatava andmestiku nime ning loodava faili nime jutumärkides (vajaduse korral koos kataloogiteega):
-```{r, eval = F}
-write.table(näide1, "failinimi.txt", sep = "\t")
+Võid vaadata ka, kuidas erinevad aegrea komponendid (keskmine ilma sessoonsuse mõjuta; trend antud ajahetkel; sesoonsus antud ajahetkel) on ajas käitunud:
+
+```{r}
+plot(fitted(m1))
 ```
 
-### Ülesanded
+Võid võrdluseks vaadelda ka seda, kuidas mõni teine meetod üritab aegrida komponentideks jagada:
 
-1. Vaata `read.table` käsu argumentide täielikku loetelu dokumentatsioonist.
-
-1. Aadressil https://github.com/Rkursus/tykliinikum/tree/master/data/ leiad failid *tabel1.csv*, *tabel2*, *tabel3.txt*. Tutvu nendega (Notepadi vmt kasutades) ja proovi need seejärel R-i korrektselt sisse lugeda. Veendu, et R-is olevates tabelites on sama palju veerge kui originaalandmestikes.
-
-1. Paljud riiklikud institutsioonid võimaldavad päris sageli andmekogudele vaba ligipääsu. Selles aines kasutame näidisandmestikena USA Rahvaloendusbüroo^[http://www.census.gov/data.html] poolt kogutud andmeid, millele saab ligi IPUMS-USA^[Steven Ruggles, J. Trent Alexander, Katie Genadek, Ronald Goeken, Matthew B. Schroeder, and Matthew Sobek. Integrated Public Use Microdata Series: Version 5.0 [Machine-readable database]. Minneapolis, MN: Minnesota Population Center [producer and distributor], 2010.] liidese kaudu^[https://usa.ipums.org/usa-action/variables/group]. Aadressil https://github.com/Rkursus/tykliinikum/tree/master/data/ on fail *mass.txt*, milles on Massachusettsi osariigis ühe valikuuringuga kogutud andmed. Loe see R-i sisse, andmestiku objektile pane nimeks `andmed`. Tutvu ka tunnuste kirjeldusega: https://github.com/Rkursus/tykliinikum/raw/master/data/descr.txt. Andmestikuobjektist esmase ülevaate saamiseks kasuta käsku `str(andmed)`.
-
-```{r, echo = F, results = "hide"}
-
-
-# 2. loe sisse 4 andmetabelit
-tab1 <- read.table("https://github.com/Rkursus/tykliinikum/raw/master/data/tabel1.csv", sep = ",", header = TRUE)
-tab2 <- read.table("https://github.com/Rkursus/tykliinikum/raw/master/data/tabel2", sep = ";", header = TRUE)
-tab3 <- read.table("https://github.com/Rkursus/tykliinikum/raw/master/data/tabel3.txt", sep = "\t", header = TRUE, na.strings = ".")
-tab1;tab2;tab3
- 
-
-
-# 3.
-andmed <- read.table("https://github.com/Rkursus/tykliinikum/raw/master/data/mass.txt", header = T, sep = "\t")
+```{r}
+plot(stl(y, "per"))
 ```
 
 
+# ARIMA - mudelid
 
-## Esmase ülevaate saamine andmetabelist
+On veel mudeleid, mille abil on võimalik aegrea struktuuri esitada, nt ARIMA mudelid. ARIMA ehk _AutoRegressive Integrated Moving Average_ proovib samamoodi aegrea komponentideks lahti lõhkuda autoregressiivse strutuuri abil.
 
-Käsuga `read.table(.)` sisse loetud andmestik on erilist tüüpi, **`data.frame`**-tüüpi objekt. Andmestikust saab kiire ülevaate järgmiste käskudega:
+Põhiliseks kasutusvaldkonnaks on lühiajaline prognoosimine:
 
-<!--
---------------- | ---------------
-`nrow(andmed)`  | mitu rida on andmestikus
-`ncol(andmed)`  | mitu veergu on andmestikus
-`dim(andmed)`   | mitu rida ja mitu veergu on andmestikus
-`str(andmed)`   | andmestiku struktuur: mis tüüpi iga tunnus on ja millised on mõned esimesed väärtused
-`summary(andmed)` | lühike kirjeldav statistika iga tunnuse kohta
-`names(andmed)` | veergude nimed
-`head(andmed)`  | andmestiku mõned esimesed read
--->
+* makroökonoomika aegread
+* finantsaegread
+* ettevõtluses nõudlus
 
----------------   -----   ------------------------------------------------------------------------------------------------
-`nrow(andmed)`      -     mitu rida on andmestikus
-`ncol(andmed)`      -     mitu veergu on andmestikus
-`dim(andmed)`       -     mitu rida ja mitu veergu on andmestikus
-`str(andmed)`       -     andmestiku struktuur: mis tüüpi iga tunnus on ja  esimesed väärtused
-`summary(andmed)`   -     lühike kirjeldav statistika iga tunnuse kohta
-`names(andmed)`     -     veergude nimed
-`head(andmed)`      -     andmestiku mõned esimesed read
----------------   -----   ------------------------------------------------------------------------------------------------
-
-Käsu `summary(.)` puhul on näha, et mõne tunnuse puhul arvutatakse keskmine, miinimum, maksimum jne, aga teise tunnuse puhul esitatakse sagedused. See, millist kirjeldusviisi kasutatakse, tuleneb tunnuse tüübist. Kui käsuga `str(.)` vaadata, mis on tunnuste tüübid selles andmestikus, on näha kahte tüüpi tunnuseid: `int` ja `Factor`. On näha, et `summary(.)` käsk arvutab `int`-tüüpi tunnustele keskmisi jne, `Factor`-tüüpi tunnustele aga sagedusi. Faktortüüpi tunnus sarnaneb sõnele (*character*), kuid üheks erinevuseks on näiteks fikseeritud väärtuste hulk.
-
-
-
-## Lisapakettide kasutamine
-
-Üks R-i populaarseks muutumise põhjuseid on rikkalik lisapakkettide olemasolu. Tõenäoliselt leidub iga praktilise statistika-alase (ja ka mõne muu valdkonna) probleemi jaoks omaette pakett (*package*). Näiteks paketid `foreign`, `haven`, `readxl` sisaldavad funktsioone, mis aitavad erinevates formaatides andmestikke hõlpsamini R-i sisse lugeda. Andmete impordiks sobilikke lisapakette on lisaks nimetatutele veel. Siinkohal vaatame aga  kahe paketi `haven` ja `readxl` võimalusi.
-
-Lisapaketid ei ole tavaliselt R-iga kaasas, vaid need tuleb installeerida. Kui paigaldatav pakett vajab omakorda mingeid muid pakette, siis installeeritakse ka need. Mõnikord võib R pakette installeerides küsida millisest serverist soovib kasutaja neid alla laadida. Kuna R-i taga on suur võrgustik, siis allikaid leidub üle maailma ja tasub valida Eestile lähim allikas. Järgmistel kordadel sama töösessiooni jooksul pakette paigaldades seda enam ei küsita.
-
-Installeerime lisapaketid `readxl` ja `haven`
-```{r, eval=FALSE}
-install.packages("readxl")
-install.packages("haven")
-# NB! Arvutiklassi arvuti korral võib olla vajalik salvestuskoha ettemääramine
-# install.packages("readxl", lib = "C:/kataloog-paigaldamiseks")
-```
-
-Kui pakett on paigaldatud, siis järgmisel töösessioonil seda enam uuesti paigaldama ei pea. Küll aga tuleb arvutisse paigaldatud paketid igal uuel R-i sessioonil sisse laadida käsuga `library` (või `require`), mille argumendiks on laaditava paketi nimi:
-```{r, results='hide', warning=FALSE}
-library(readxl)
-# Kui paigaldamisel oli käsitsi määratud salvestuskoht:
-# library(readxl, lib.loc = "C:/kataloog-installimiseks")
+Esmalt veendu, et sul oleks `forecast` pakett paigaldatud ja töömällu loetud:
+```{r eval = F}
+install.packages('forecast')
+library(forecast)
 ```
 
 
-## Andmete import MS Excel, SAS, Stata, SPSS failidest
+R-is on kindel abimees funktsioon `auto.arima()`
 
-RStudio on tulnud mitmes kohas appi ja seda ka andmete importimisel. Nimelt on paremal aknas `Environment` vahelehel nupp `Import Dataset`. Valides seal sobiva programmi ja seadistades nii, et impordi eelvaade on selline nagu peab. Siis piisab kui vajutada lihtsalt `Import` nuppu.
-
-NB! Et seda sammu ei peaks kordama, siis kopeeri `Code preview` aknas olev kood oma R skripti faili.
-
-
-### Näide Exceli faili impordist paketi `readxl` ja konsooli abil
-
-Lisapaketi `readxl` käsu `read_excel(.)` abil saab importida MS Exceli failide (nii *.xlsx* kui *xls*) töölehti. Salvesta  aadressilt https://github.com/Rkursus/tykliinikum/tree/master/data/ oma töökataloogi fail *tudengite-arv.xlsx*, mis sisaldab infot TÜ tudengite arvude kohta aastate lõikes. Ava esmalt fail MS Exceli abil ning vaata millised töölehed failis on. Seejärel vaata ka  R-i abil millised on töölehtede nimed ja impordi teine tööleht, millel on andmed kunagise avatud ülikooli õpilaste arvude kohta. 
-
-```{r, eval=FALSE}
-list.files() # vaata, mis nimega failid on töökaustas
-excel_sheets("tudengite-arv.xlsx") # töölehtede nimed MS Exceli failis
-AY <- read_excel("tudengite-arv.xlsx", sheet = "avatud ylikool") # importimine
-# AY <- read_excel("tudengite-arv.xlsx", sheet = 2)  # sama
-str(AY)  # vaata tulemust
-```
-
-MS Exceli failis ei pruugi andmed alata alati esimesest reast, näiteks töölehel *tabel* on esimeses reas tabeli nimi ning teine rida on tühi, andmetabel algab kolmandalt realt. Selle, et esimesed kaks rida tuleks andmete impordil vahele jätta, saab käsule `read_excel(.)` ette anda argumendi `skip` abil:
-```{r, eval=FALSE}
-tabel <- read_excel("tudengite-arv.xlsx", sheet = "tabel", skip = 2)
-str(tabel)
-```
-
-Kui andmete töötlemine on lõpetatud, siis saab R-i andmestiku `haven` paketi abil ka eksportida vaadeldud programmide andmefailiks käsuga `write_<...>(.)`, kus `<...>` tuleks siis asendada sobiliku programminimega, nt. `write_sas()` või `write_sav`. 
-
-Samas ei pruugi need käsud siiski olla 100% töökindlad olla. Näiteks võib juhtuda, et `write_sas()` käsu tulemust uuem SAS omaks ei tunnista või osa informatsioonist on puudu (nt. tunnuste kodeeringud SPSS `*.sav` failist)). Sellisel on esimesed sammud: 
-
-  * uuendage pakett `haven`;
-  * eksportida R-st fail ja SAS-i/SPSS-i importimisel öelda, et tegemist on vanema versiooniga;
-  * kaduma läinud informatsioon R-st eraldi eksportida ja liita SAS/SPSS-s.
-
- 
-
-### Ülesanded
-
-1. Impordi failist *tudengite-arv.xlsx* viimane tööleht *kokku*, kus on tudengite arvud aastate lõikes. Vaata esmalt ka `read_excel()` funktsiooni dokumentatsiooni. 
-Joonista joondiagramm tudengite arvust aastate kaupa funktsiooniga `plot()`.
-```{r, eval=FALSE, echo = F}
-download.file("https://github.com/Rkursus/tykliinikum/raw/master/data/tudengite-arv.xlsx", "tudengite-arv.xlsx")
-
-kokku <- read_excel("tudengite-arv.xlsx", sheet = "kokku")
-kokku <- read_excel("praks1import/tudengite-arv.xlsx", sheet = "kokku", col_names = F)
-kokku <- read_excel("praks1import/tudengite-arv.xlsx", sheet = "kokku", col_names = c("aasta", "arv"))
-summary(kokku)
+```{r}
+y = ts(reisijaid, start=c(2012,5), frequency=12)
+m2 = auto.arima(y)
+prog = forecast(m2, h=10)
+plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos")
 ```
 
 
 
- 
+
