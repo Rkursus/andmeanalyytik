@@ -20,5 +20,6 @@ version:          1.0.0
 github:
   repo:           http://rkursus.github.io/andmeanalyytik
 
-pages_list:       
+pages_list:
+  Materjalid:   '/materjalid'
   Lisamaterjal: '/lisamaterjal'
