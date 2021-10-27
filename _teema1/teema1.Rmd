@@ -1,6 +1,8 @@
 ---
 title: "Klientide segmenteerimine"
-output: html_document
+output: 
+  html_document:
+    theme: null
 ---
 
 ```{r setup, include=FALSE}
