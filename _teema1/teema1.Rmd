@@ -172,6 +172,7 @@ Kuna keskmised on tugevalt mõjutatud ekstreemsete väärtuste poolt, siis tuleb
 
 Võrdle näiteks järgmisi jooniseid:
 
+<!--
 ```{r echo = F, figures-side, fig.show="hold", out.width="50%"}
 
 hist(kliendid$kaive, xlab = 'Käive',
@@ -184,6 +185,7 @@ hist(log(kliendid$kaive), xlab = 'Logaritmitud käive',
 
 
 ```
+-->
 Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
 
 Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
