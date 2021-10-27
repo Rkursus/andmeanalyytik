@@ -40,7 +40,14 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 
 **Kodus**
 
-Kodutöö ...
+Teemade kinnistamiseks vaata läbi järgmised videod:
+
+1. [Andmeanalüüsiks ettevalmistus](https://www.youtube.com/watch?v=zVImIQuqjQ0)
+1. Klasterdamine - vali siit üks video:
+	* [K Means Clustering: Pros and Cons of K Means Clustering](https://www.youtube.com/watch?v=YIGtalP1mv0)
+	* [Computerphile - Clustering k-means VS PAM](https://www.youtube.com/watch?v=KtRLF6rAkyo)
+1. [Aegridade analüüs ja ennustamine](https://www.youtube.com/watch?v=AvG7czmeQfs)
+
 
 ## Asjume asja kallale
 
