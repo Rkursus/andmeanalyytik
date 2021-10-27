@@ -1,6 +1,8 @@
 ---
 title: "Tuleviku prognoosimine"
-output: html_document
+output: 
+  html_document:
+    theme: null
 ---
 
 ```{r echo = F}

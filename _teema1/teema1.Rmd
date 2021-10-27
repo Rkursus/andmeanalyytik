@@ -153,17 +153,17 @@ Segmenteerimiseks kasutame k-keskmiste meetodit (_k-means clustering_) mis püü
 
 Näiteks olgu andmestikus pikkus, kaal ja sugu. Tekitades hajuvusdiagrammi ning värvides punktid soo järgi saame:
 
-<!--![](pilt1.png)-->
+![](pilt1.png)
 
 Nagu näha, siis eristuvad mehed ja naised üsna hästi kaalu ja pikkus järgi. Aga oletame, et me ei tea sugu ja proovime statistiliste meetodite abil hinnata, kas õnnestub antud andmestik jagada kaheks. 
 
 K-keskmiste klasterdamise puhul on eesmärk jagada objekti _k_ klastrisse nii, et iga objekt kuuluks klastrisse mille keskpunkt on talle kõige lähedam. Antud juhul _k_ = 2 ja nagu näha, siis õnnestus objektide gruppeerimine üsna sarnaselt sellele, mida indikeerib sugu.
 
-<!--![](pilt2.png)-->
+![](pilt2.png)
 
 Suuruse _k_ saame ise määrata, näitek _k_ = 3 puhul oleks tuelmus järgmine:
 
-<!--![](pilt3.png)-->
+![](pilt3.png)
 
 Küll aga on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned ettevalmistused.
 
@@ -175,7 +175,7 @@ Kuna keskmised on tugevalt mõjutatud ekstreemsete väärtuste poolt, siis tuleb
 
 Võrdle näiteks järgmisi jooniseid:
 
-<!--
+
 ```{r echo = F, figures-side, fig.show="hold", out.width="50%"}
 
 hist(kliendid$kaive, xlab = 'Käive',
@@ -188,7 +188,7 @@ hist(log(kliendid$kaive), xlab = 'Logaritmitud käive',
 
 
 ```
--->
+
 Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
 
 Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
