@@ -25,7 +25,7 @@ library(corrplot)
 ```{r echo = F, message = F}
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(corrplot))
+suppressWarnings(suppressPackageStartupMessages(library(corrplot)))
 ```
 
 
@@ -134,13 +134,14 @@ jaemyyk <- jaemyyk %>%
 
 Jällegi ei pruugi toorandmed olla meie küsimustele vastamiseks piisavad. Hetkel huvitab meid klienditaseme info, mitte tehingu taseme info. Peame agregeerima, selleks grupeerime andmed esmalt kliendi kaupa:
 
-```{r}
+```{r message=F}
 kliendid <- jaemyyk %>% 
   group_by(kliendi_id) %>% 
   summarise(kaive = sum(myyk),
             tehinguid = length(unique(arve_nr)), # unikaalsete tehingute arv
             kesk_ost = kaive / tehinguid)
 
+summary(kliendid)
 ```
 
 
