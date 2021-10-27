@@ -1,267 +1,265 @@
 ---
-title: "Klientide segmenteerimine"
-output: html_document
+title: "Rakendustarkvara: R"
+output: 
+  html_document:
+    theme: null
+    number_sections: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+ 
+```{r setup, cache=FALSE, include=FALSE}
+knitr::opts_chunk$set(collapse = FALSE)
 
-## Ettevalmistused
+hook1 <- function(x){ gsub("```\n*```r*\n*", "", x) }
+hook2 <- function(x){ gsub("```\n+```\n", "", x) }
+#knitr::knit_hooks$set(document = hook2)
 
-Kui soovid koolitust oma arvutiga kaasa teha, siis esmalt paigalda Rstudios järgmised paketid. Vaikimisi seadistustega laetakse need sulle alla ja paigaldatakse automaatselt. Kuna mitmed paketid kasutavad veel omakorda lisapakette, siis võib juhtuda, et sinu arvutisse paigaldatakse palju rohkem pakette kui allolevas koodis kirjas.
-
-```{r eval = F}
-install.pacakges('readxl')
-install.packages('dplyr')
-install.packages('corrplot')
-
-# Ja laeme paketid töömällu järgmiselt
-library(readxl)
-library(dplyr)
-library(corrplot)
-```
-
-```{r echo = F, message = F}
-suppressPackageStartupMessages(library(readxl))
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(corrplot))
 ```
 
 
+# Lühike sissejuhatus
 
-```{r eval = F, echo = F}
-# Töökausta seadistamine - 
-#    töökaustaks seatakse automaatselt kaust kus asub käesolev fail
-install.packages('rstudioapi')
-setwd(dirname(rstudioapi::getActiveDocumentContext()[[2]]))
+R on programmeerimiskeel ja -keskkond, mis on arendatud statistiliseks andmetöötluseks aga tänapäeval saab sellega teha palju muudki. Mõned põhjused, miks R on niivõrd paljuräägitud teema:
+
+* R-i kasutajaskond on viimase kümmekonna aasta jooksul [oluliselt kasvanud](r4stats.com/articles/popularity/) ülikoolides ja ettevõtetes,
+* [R on vabavara](https://cran.r-project.org/),
+* R-ga käib kaasas [lai valik lisapakette](https://cran.r-project.org/web/packages/available_packages_by_name.html),
+* R võimaldab tänapäeval juba [palju enamat](https://www.google.com/search?q=r+possibilities) kui ainult andmetöötlus,
+* R on ühildatav pea kõigi tuntumate andmetöötlusprogrammidega (nt. MS Excel, Tableau, SPSS, Qlik, Power BI, ...)
+* ...
+
+R-i kodulehelt saab vajaliku tarkvara alla laadida: http://www.r-project.org/
+
+## Kasutajaliides
+
+Kuna R on tegelikkuses programmeerimiskeel, siis R-il endal on äärmiselt minimalistlik kasutajaliides. Üks alternatiivne kasutajaliides R-i kasutamiseks on **RStudio**^[http://www.rstudio.com/], kus koodi kirjutamine on mitmel viisil hõlpsam. Koolitusel hakkamegi edaspidi kasutama programmi RStudio.
+
+Ava Start-menüü ja otsi programm nimega RStudio, käivita see.
+
+* Avanenud programmiaken jaguneb neljaks. Akende paigutust saab oma suva järgi muuta, kuid esialgu paiknevad paremal aknad, mis annavad ülevaate kasutatavatest kaustadest, defineeritud muutujatest, graafikutest jne ning vasakul on R-i konsool ja tekstiredaktor käskude kirjapanekuks;
+* R konsool
+    - alumine vasakpoolne aken on programmi R konsooliaknen, kuhu saab programmi käsud kirjutada viiba `>` järele;
+    -	käsk täidetakse pärast `Enter`-klahvi vajutamist;
+    -	varem sisestatud käske saab tagasi sirvida nooleklahviga $\uparrow$;
+    -	plussmärk `+` rea ees näitab, et käsk on pooleli.
+* Tekstiredaktor
+    - tekstiredaktorisse saate kirjutada R-i käsud/koodi ja kommentaarid;
+    - käsufaili ühel real peab olema kirjutatud üks käsk (reavahetus näitab programmile käsu lõppu), kui soovid ühele reale kirjutada mitu käsku, siis need tuleb eraldada semikooloniga `;`
+    - kommentaari lisamiseks tuleb vastava rea algusess lisada `#`-märk;
+    - mingi koodilõigu käivitamiseks tuleb see hiirega ära valida ning vajutada klahvikombinatsiooni `Ctrl+Enter`.
+    - kui reavahetus on lisatud ekslikult (näiteks on koodis näha viga just eelnevas reas) saab uue tühja käsurea tekitada vajutades `Esc` klahvi. 
+
+Kui käsk on sisestatud, siis `enter`-klahvi vajutamise järel käsk täidetakse  ja tulemus trükitakse konsooliaknasse. Sageli on siis rea alguses kantsulgudes mingi arv, mis näitab, mitmes tulemuse element on rea alguses -- nimelt võib tulemus mõnikord koosneda mitmest elemendist.
+```{r,prompt=TRUE,comment=NA}
+4 * 6
+```
+```{r,prompt=TRUE,comment=NA}
+4 * 
+6
+```
+```{r,prompt=TRUE,comment=NA}
+4 * (1:40)
+
 ```
 
+Konsooli käskude sisestamise asemel on neid mõistlik kirjutada skriptifaili, et hiljem (nt järgmisel päeval) saaks tehtud tööd (näiteks mingi analüüsi) kiiresti jätkata või uuesti teha kui on lisandunud uued andmed. Skriptifaili tekitamiseks RStudios tuleks valida menüüst `File` valik `New File` ja `R script`. Avatakse skriptiaken, kuhu saab käske kirjutada. Kui skriptiaknas olles vajutada klahve `Ctrl+Enter`, siis vastaval real olev käsk saadetakse R-ile täitmiseks. Kui käsk on kirjutatud mitmel real või on soov mitut käsku järjest jooksutada, võib vastavad read skriptiaknas hiirega ära märkida ning seejärel `Ctrl+Enter` vajutada. Valides menüüst `File` valiku `Save`, salvestatakse `.R` lõpuga skriptifail kasutaja poolt määratud asukohta.\medskip\medskip
 
-## Sissejuhatus
 
-Klientide segmenteerimiseks (või ükskõik milliste andmete lahterdamiseks) kasutame k-keskmiste meetodit (_k-means_). Käime läbi järgmised etapid:
+Sriptiaknas on mõislik käskudele lisada kommentaare, et teinekord või teisel inimesel oleks koodi lihtsam lugeda. **Kommentaare** saab R-i koodis lisada ainult rea lõppu, kasutades trellide-sümbolit:
+```{r,eval=TRUE}
+log(5.9)  # võtame naturaallogaritmi arvust 5,9
+# terve see rida on kommentaar, sest rea alguses on # ehk trellide sümbol
+```
 
-* Andmetega tutvumine
-* Andmete puhastamine
-* Andmete rikastamine
-* Uute andmete eraldamise, agregeerime
-* Teostame segmenteerimise
-* Analüüsime tulemusi
+Pane tähele, et **kümnendmurru eraldamiseks** kasutatakse R-is punkti, mitte koma.
 
-Näidis analüüsi tegemiseks kasutame vabalt kättesaadavat andmestikku [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/online+retail#) veebilehelt, mis on omakorda saanud andmed [Chen, Sain & Guo (2012)](https://link.springer.com/article/10.1057/dbm.2012.17) artiklist. 
 
-Andmesikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1. detsember 2010 - 9.  detsember 2011. Veebipoes müüakse enamasti igasugusteks puhkudeks kingitusi ja paljud veebipoe kliendid on jae- või hulgimüüjad. Veebipood tegutseb rahvusvaheliselt aga suur enamus klientuurist on pärit Suurbritanniast.
+## Lihtsam aritmeetika
 
-Andmestiku saate sisse laadida järgmise käsu abil:
+R-is on võimalik teha kõiki lihtsamaid aritmeetilisi tehteid, sealjuures järgitakse matemaatikas kasutatavat tehete järjekorda (sulgusid lisades on võimalik seda muuta): 
 
+- `1 + (2 - 3) * 4 / 5`
+- `2^3 - 2**3` -- astendamiseks saab kasutada sümboleid `^` ja `**`
+- `5 %% 3` -- modulo (jääk jagamisel)
+- `log(exp(1)) * cos(-pi) * sqrt(9) + factorial(4) - choose(4, 2) * min(4, 5, 2)`   
+   on sama, mis $\ln{(e^1)} \cdot \cos{(-\pi)} \cdot \sqrt{9} + 4! - \binom{4}{2} \cdot \min(4,5,2)$
+- `1/0` annab tulemuseks `Inf` (*infinity*)
+- `0/0` annab tulemuseks `NaN` (*not a number*)
+
+### Ülesanded
+
+1. Arvuta enda kehamassiindeks: kaal (kg) / pikkus^2^ (m^2^). (Koolitajale ei pea näitama.)
+
+\
+\
+
+
+
+
+
+## Käsud ja abi saamine
+<!--Kõige lihtsam on abi saada interneti otsimootorite kaudu. -->
+
+Ülalolevad aritmeetikaavaldised `sqrt(9)`, `choose(4, 2)` jne on tegelikult **käsud** ehk **funktsioonid**, mis oskavad teatud asju teha (praeguses näites teatud arvutusi teha). Kõigil käskudel on sarnane süntaks:
+
+`käsk(argumendid)`
+
+Üldiselt on käsu argumentidel ka nimed, näiteks käsk `choose` tahab täpselt kahte argumenti: `n` ja `k`. Mõnikord on kasulik argumentide nimed välja kirjutada, et hiljem koodi üle lugedes oleks aru saada, mida miski tähendab:
+```{r,eval=FALSE}
+choose(n = 4, k = 2)
+```
+
+Kui kasutada argumentide nimesid, siis ei ole tähtis, millises järjekorras argumendid käsule ette anda. Ent kui argumentide nimesid ei kasuta, tuleb olla ettevaatlik:
 ```{r}
-library(readxl)
-jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
-     col_types = c("text", "text", "text", 
-          "numeric", "date", "numeric", "text", 
-          "text"))
-
-
+choose(k = 2, n = 4)
+choose(2, 4)
 ```
 
-## Andmeväljad ja andmestikuga tutvumine
-
-Kui andmestikuga kaasa tulnud tunnuste kirjeldused on järgmised:
-
-* `arve_nr` - Arve number. Nominaalne tunnus, 6-kohaline arv, mis on iga tehingu puhul unikaalne. Kui kood algab 'c' tähega, siis indikeerib see tühistatud tehingut.
-* `kood` - Toote või kauba kood. Nominaalne tunnus, 5-kohaline unikaalne number iga toote kohta.
-* `kirjeldus` - Toote või kauba kirjeldus. Nominaalne tunnus.
-* `kogus` - Iga toote või kauba kogus, mis osteti käesoleval tehingul. Numbriline tunnus.
-* `ostu_kp` - Tehingu toimumise kuupäev ja kellaaeg.
-* `yhiku_hind` - Toote või kauba ühiku hind. Numbriline, valuuta GBP.
-* `kliendi_id` - Unikaalne kliendi ID. Nominaalne tunnus, 5-kohaline number.
-* `riik` - riigi nimi. Nominaalne tunnus, riik, kus klient resideerub.
-
-Veendumaks, et tõepoolest on kõik tunnused olemas ning uurimaks andmete sisu, siis käivita järgmised käsud. Mida teevad käsud `head()`, `str()` ja `summary()`?
-
+Osadel käskudel on mõnedele argumentidele antud  niinimetatud vaikimisi väärtused. Neid argumente ei pea (aga võib) käsu kasutamisel välja kirjutama kui vaikimisi argument on parajasti sobiv väärtus. Näiteks on käsul `log` vaikimisi määratud argumendi `base` ehk logaritmi aluse väärtus arvuga $e \approx 2.718282$ st käsk arvutab naturaallogaritmi. Kui on soov leida naturaallogaritmi arvust 8, siis võib käsu kirja panna  `log(8)`, kui aga on vaja leida arvu 8 logaritmi baasil 2, siis tuleks argumendi `base` vaikimisi väärtust muuta, ehk
 ```{r}
-head(jaemyyk)
-str(jaemyyk)
-summary(jaemyyk)
+log(8, base = 2)
 ```
 
-Kas neid väljavõtteid vaadates tekkis mõni küsimus, mida sooviks lähemalt uurida? Näiteks milline on numbriliste väljade jaotus? Mis riikidest on veebipoe kliendid pärit?
+Kui mingi konkreetse käsu kohta soovitakse abi saada (näiteks kontrollida, mis on käsu argumentide nimed ja millises järjekorras need tuleks ette anda), võib konsooli trükkida `?käsu_nimi` või ka `??otsitav_tekst`:
+```{r,eval=FALSE}
+?choose
+??"logarithm"
+```
+ 
 
-Kui eelnevast ei piisanud võib andmeid edasi uurimiseks genereerida järgmise väga põhjaliku [raporti](report.html):
-
-```{r eval = F}
-library(DataExplorer)
-DataExplorer::create_report(jaemyyk)
+Tasub tähele panna, et R on (nagu suurem osa programmeerimiskeeli) **tõstutundlik** -- see tähendab, et programm eristab suuri ja väikeseid tähti. Kui ajada käsu või argumendi nimes mõni suur- ja väiketäht segi, siis on tulemuseks veateade:
+```{r,error=TRUE}
+Log(5)
+log(8, BASE = 2)
 ```
 
+### Ülesanded
 
-## Andmete puhastamine
+1. Vaata, kuidas töötab käsk `log10`, mis on selle argumendid.
+1. Vaata milline abileht avaneb, kui kasutada käsku `?"*"`.
+1. Leia funktsioon, mis arvutaks nurga $\pi/2$ siinuse.
+<!-- 1. Vaata milline abileht avaneb, kui kasutada käsku `?reserved` -->
 
-Eelnevast andmetega tutvumisest selgus, et paljud andmepunktid on ebaloogilised või ebavajalikud. Kui ise töötate juba pikemat aega andmeanalüütikuna ühes ja samas ettevõttes, siis on tihti anomaaliate põhjused teada. Kui aga andmestik on täiesti uus, siis tuleks ebaloogiliste andmete põhjused välja uurida. 
 
-Kui tegemist on vigase sisestusega (nt hind sisestati käsitsi ja koma jäi kahe silma vahele), siis tuleks sellised andmed välja jätta või ära parandada kui võimalik.
 
-Kui aga on tegemist erindiga, siis on otsustuskoht, kas erindid sisse jätta või minema visata. Hetkel viskame erindid ja ebaloogilised väärtused välja, sest ei ole võimalik nende põhjust välja uurida ning need võivad segmenteerimist segama hakata.
 
-Puhastame andmestiku:
+# Muutujatega töötamine
 
+## Väärtuste omistamine ja töökeskkond (*environment*)
+Sageli on mugav, kui töös kasutatavatele muutujatele nimi anda -- siis saame neid edaspidi nimepidi kutsuda. Näiteks kui nimetada `kaal <- 70`  ja  `pikkus <- 185` ehk konsoolil
 ```{r}
-jaemyyk <- jaemyyk %>% 
-  filter(!is.na(kliendi_id), # tehingud millel puudub kliendi ID
-         kogus > 0,          # ainult kogus > 0
-         yhiku_hind > 0,     # Ühiku hind olgu alati positiivne
-         substr(arve_nr,1,1) != 'C', # Eemaldame tühistatud tehingud
-         kogus < 3000,       # Ebamõistlikult suured kogused
-         yhiku_hind < 3000   # Väga kallid tooted jätame kõrvale
-         )
-
-summary(jaemyyk)
+kaal <- 70
+pikkus <- 185
 ```
-
-## Rikastame andmeid
-
-Esialgne andmestik ei pruugi kogu informatsiooni sisaldada, seega tuleks alati vaadata, kas saab uusi tunnuseid lisada, mis teevad analüüsi sisukamaks. Hetkel ei anna toote ühiku hind ja ostetud toote kogus piisavat infot kliendi käitumisest. Leiame ostu summa ja kuupäevad on alati hea infoallikas tegemaks keerukamaid analüüse - kuu vs kuu muutus, sessoonsus, tunnuste ajaline sõltuvus jpm.
-
+siis saaks kehamassiindeksit arvutada nii:
 ```{r}
-# Rikastame andmeid
-jaemyyk <- jaemyyk %>% 
-  mutate(myyk = yhiku_hind * kogus,
-         ostukuu = months(ostu_kp))
+kaal / (pikkus / 100)**2
 ```
 
-## Agregeerime klientide andmed
+Tekitasime  esimesel sammul töökeskkonda kaks objekti, mille nimed on `kaal` ja `pikkus`. Täpsemini: tekitasime objektid `kaal` ja `pikkus`, millele omistasime väärtused 70 ja 185. Sümboliühendit `<-` nimetatakse omistamisoperaatoriks. Üldjuhul töötab omistamisoperaatorina ka võrdusmärk `=`, ent on mõned erandjuhtumid, kus need erinevalt töötavad; lisaks on võrdusmärk kasutusel käskude argumentidele väärtuse andmisel.
 
-Jällegi ei pruugi toorandmed olla meie küsimustele vastamiseks piisavad. Hetkel huvitab meid klienditaseme info, mitte tehingu taseme info. Peame agregeerima, selleks grupeerime andmed esmalt kliendi kaupa:
-
+Kui nüüd muuta `kaal` väärtust: `kaal <- 90` `r kaal <- 90`, siis konsoolis ülesnoolega üle-eelmise käsu (KMI arvutamise) üles otsides saab seda lihtsasti uuesti jooksutada.
 ```{r}
-kliendid <- jaemyyk %>% 
-  group_by(kliendi_id) %>% 
-  summarise(kaive = sum(myyk),
-            tehinguid = length(unique(arve_nr)), # unikaalsete tehingute arv
-            kesk_ost = kaive / tehinguid)
-
+kaal / (pikkus / 100)**2
 ```
 
-
-# Segmenteerimine k-keskmiste meetodi abil
-
-Segmenteerimiseks kasutame k-keskmiste meetodit (_k-means clustering_) mis püüab leida andmepunktide grupeeringuid - ja nagu nimi ütleb, siis keskpunktide kaudu.
-
-Näiteks olgu andmestikus pikkus, kaal ja sugu. Tekitades hajuvusdiagrammi ning värvides punktid soo järgi saame:
-
-![](pilt1.png)
-
-Nagu näha, siis eristuvad mehed ja naised üsna hästi kaalu ja pikkus järgi. Aga oletame, et me ei tea sugu ja proovime statistiliste meetodite abil hinnata, kas õnnestub antud andmestik jagada kaheks. 
-
-K-keskmiste klasterdamise puhul on eesmärk jagada objekti _k_ klastrisse nii, et iga objekt kuuluks klastrisse mille keskpunkt on talle kõige lähedam. Antud juhul _k_ = 2 ja nagu näha, siis õnnestus objektide gruppeerimine üsna sarnaselt sellele, mida indikeerib sugu.
-
-![](pilt2.png)
-
-Suuruse _k_ saame ise määrata, näitek _k_ = 3 puhul oleks tuelmus järgmine:
-
-![](pilt3.png)
-
-Küll aga on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned ettevalmistused.
-
-## k-keskmiste klasterdamise ettevalmistused
-
-Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned esktreemsed väärtusd. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt `hist(kliendid$kaive`.
-
-Kuna keskmised on tugevalt mõjutatud ekstreemsete väärtuste poolt, siis tuleb nende mõju vähendada. Selleks on erinevaid andmete transformeerimisviise - nt logaritmimine. 
-
-Võrdle näiteks järgmisi jooniseid:
-
-```{r echo = F, figures-side, fig.show="hold", out.width="50%"}
-
-hist(kliendid$kaive, xlab = 'Käive',
-     main = 'Tunnuse "käive" histogramm',
-     ylab = 'sagedus')
-
-hist(log(kliendid$kaive), xlab = 'Logaritmitud käive',
-     main = 'Logaritmitud "käive" histogramm',
-     ylab = 'sagedus')
+Siit maksab tähele panna ka seda, et muutujale uut väärtust omistades kirjutatakse vana lihtsalt üle, mingit hoiatust R ei anna.
 
 
+Töökeskkonnas olevatest objektidest saab ülevaate RStudios paremal üleval aknast `Environment` või konsoolis käsuga `ls()`. Töökeskkonnas olevaid objekte saab kustutada  käsuga `rm(.)` (sulgudes olev punkt asendada sobivate argumentidega):
+```{r, results='hide'}
+rm(kaal, pikkus)
+ls() #kontrolli, kas objektid kustutati töölaualt
 ```
-Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
+Lisaks skriptifailile on võimalik ka töökeskkonda salvestada ning hiljem see uuesti sisse laadida. Selleks peab RStudios konsooliakna aktiivseks tegema ja valima menüüst `File` vastavalt `Save workspace` või `Load workspace`. RStudios leiab need toimingud aga menüüst `Session`. Käsurealt on töökeskkonda võimalik salvestada RData failiks  käsuga `save.image()`. 
 
-Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
+Töökeskkonna salvestamisel salvestatakse kõik antud töökeskkonnas olnud objektid RData-faili. Hiljem saab kõik need objektid jälle RData failist töökeskkonda laadida käsuga `load(".RData")`. RData formaati üldiselt teised statistikaprogrammid lugeda ei oska. Kui salvestatud on käskude ehk skripitfail (laiendiga .R), siis objektide eraldi salvestamine pole enamasti vajalik.
 
-Kogu eelneva saame tehtud järgmiste käskudega:
 
+## Vektorid. Tehted vektoritega
+<!--Eelpool andsime andmestikust mitme veeru (või rea) korraga eraldamiseks vajalikud veeru (rea) numbrid ette käsuga `c(.)`.-->
+Eelmises punktis vaatasime juhtu, muutujate väärtuseks oli üks arv. Objekti võib aga moodustada ka mitmest väärtusest, näiteks omistame kuue uuritava kaalud muutujale nimega `kaalud` ja muutujale `liik` uuritavate liigid:
 ```{r}
-# Skaleerime andmed
-kliendid <- kliendid %>% 
-  mutate(log_kaive = log(kaive),
-         log_tehinguid = log(tehinguid),
-         log_kesk_ost = log(kesk_ost))
-
-skaleeritud <- kliendid %>% 
-  select(log_kaive, log_tehinguid, log_kesk_ost) %>% 
-  scale() 
+kaalud <- c(7, 3.5, 0.4, 2, 3.2, 20.2)
+liik <- c("koer", "kass", "rott", "kass", "kass", "koer")
 ```
-
-## Klastrite arvu _k_ määramine
-
-Kuna antud meetod tahab, et me annaksime klastrite arvu ette, siis kuidas teha seda andmetest lähtuvalt?
-
-Selleks saame kasutada "küünarnuki" meetodit (_elbow method_). Nimi on kentsakas aga tuleneb alloleva joonise kujust. Siin määratakse mitme klastriga toimub veel nö arvestatav "muutus" ehk millise klastrite arvu juures on klastrite keskpunktid üksteisest veel piisavalt kauged, et need eristaksid gruppe. Arvestatava "muutuse" määramine on tunnetuslik aga alloleval joonisel ütleks, et vasakult poolt pärast 4-ndat täppi suuremat langust enam ei toimu.
-
+Funktsiooni `c(.)` korral on tegemist käsuga, mis sellele antud argumendid kombineerib (*combine*) kokku üheks vektoriks (järjendiks). Kui kombineeritakse erinevat tüüpi väärtuseid (näiteks teksti ja arve), siis muudetakse kõik väärtused selliseks, mis võimaldab võimalikult palju infot säilitada -- kõik vektori elemendid peavad olema sama tüüpi.
 ```{r}
-# Eelnevad suurused, mis on vaja defineerida
-k = 1:20
-pr = 1
-
-# Proovime läbi kõik klasterdamised klastriarvuga 1st-20ni.
-for (i in 2:20){
-  km = kmeans(skaleeritud,i)
-  pr[i] = km$tot.withinss/km$totss
-}
-
-# Küünarnuki joonis
-plot(k,pr,type="b")
+c(987, -Inf, "jutumärgid", kaalud) # pane tähele jutumärke allolevas väljatrükis
 ```
 
-## Klientide segmenteerimine
-
-Olles teinud ära kogu eeltöö saame lõpuks leida klientide grupid. Funktsioon ise aga klastreid ei nimeta ega analüüsi, seega milliseid iseloomustavaid nimesid annaksid klastritele alloleva joonise järgi?
-
+Kindla mustriga arvujada tekitamiseks on ka muid mooduseid kui funktsioon `c`:
 ```{r}
-# Klasterdamer ja leiame klastrite keskmised (ehk keskpunkti)
-klastrid = kmeans(skaleeritud,4)
-klastrid$centers
-
-# Joonis, mis hõlbustab analüüsimist
-corrplot(klastrid$centers, is.corr=F, main = 'Klastrite keskmised')
+1:5  # täisarvud 1-st 5-ni
+2:-6 # täisarvud 2-st -6-ni
+seq(from=0, to=11, by=2) #arvud 0, 0+2, 0+2+2, ..., kuni jõutakse väärtuseni 11
+seq(0, 1, 0.1) # saab ka komaga arvudest järjendeid teha
+seq(0, 1, length.out=4)  
+rep(x=c(1, 3), times=2)  # vektorit korratakse 2 korda
+rep(x=c(1, 3), each=2)   # vektori iga elementi korratakse 2 korda
 ```
-Võime veenduda oma tõlgendustes järgmiste abistavate jooniste abil:
 
+Käsku `rep(.)` saab kasutada ka **sõnede** kordamisel: `rep(c("a", "b", "c"), c(3, 2, 0))`.
 
+R-i puhul on huvitav see, et sageli tehakse mitmesuguseid tehteid elemendiviisiliselt. Mõnikord tasub olla ettevaatlik: kui asjaosalised vektorid on erineva pikkusega, siis lühemat pikendatakse automaatselt `rep(.)` käsu laadselt
 ```{r}
-plot(kliendid$log_kaive, kliendid$log_tehinguid, col = klastrid$cluster, pch = 20,
-     xlab = 'Käive',
-     ylab = 'Tehingute arv',
-     main = 'Käibe ja tehingute arvu hajuvusdiagramm')
-
-plot(kliendid$log_tehinguid, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20,
-     xlab = 'Tehingute arv',
-     ylab = 'Keskmine ostusumma',
-     main = 'Tehingute arvu ja keskmise ostusumma hajuvusdiagramm')
-
-plot(kliendid$log_kaive, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20,
-     xlab = 'Käive',
-     ylab = 'Keskmine ostusumma',
-     main = 'Käibe ja keskmise ostusumma hajuvusdiagramm')
+1:3 * 4     # iga element korrutatakse 4-ga läbi 
+1:3 + 9:7   # elemendid liidetakse paarikaupa
+1:6 * c(1, 2)  # iga teine element korrutatakse 2-ga, ei hoiatata
+1:7 * c(1, 2)  # antakse küll hoiatus, aga 7. element korrutatakse 1-ga
 ```
 
-Kui nüüd soovime teada millised kliendid kuuluvad teatud klastrisse (et siis vastavalt adresseerida või nt turundust suunata nendele), siis saame klientide ID-d eraldada järgmiste käskude abil:
-
-
-```{r eval = F}
-kliendid$kliendi_id[klastrid$cluster == 1] # 1. klastrisse kuuluvad kliendid
-kliendid$kliendi_id[klastrid$cluster == 2] # 2. klastrisse kuuluvad kliendid
-# jne
+Sageli on andmevektorist vaja kasutada vaid mingit alamosa, näiteks tahame kasutada ainult esimest kolme vaatlust või iga teist vaatlust. Vektorist elementide väljavalikuks saab kasutada kantsulge: kirjutada vektori nime järgi kantsulud ja sulgudes anda ette milliste indeksitega elemente välja valida soovime st esitada indeksite vektor. Elementide numeratsioon ehk indeksid algavad R-is väärtusest 1
+```{r}
+kaalud[1:3] # esimesed 3 elementi vektorist
+kaalud[seq(1, 6, 2)] # iga teine element alates esimesest
+(1:10)[-c(2, 4)] # negatiivne indeks jätab vastavad vaatlused välja
 ```
+
+
+
+
+### Ülesanded
+
+1. Moodusta vektor nimega `y`, mille väärtuseks oleks arvud `1 1 1  2 2 2 2  3 3 3 3 3` kasutades käsku `rep`.
+1. Leia vektor `z`, mille liitmisel `y`-le on tulemuseks vektor, mille kõik koordinaadid on võrdsed `7`.
+1. Vali eelnevast vektorist välja iga kolmas väärtus, kasutades kantsulge ja sobivat indeksite vektorit.
+1. Omista muutujale `u` väärtus 8. Proovi läbi käsud `1:u - 1` ja `1:(u-1) `. Milles on erinevus?
+
+
+
+
+
+
+## Puuduvad väärtused
+Andmete kogumisel võib juhtuda, et kõigil uuritavatel ei õnnestu vajalikke mõõtmisi teha ja andmetesse tekivad lüngad. Puuduva väärtuse tähistamiseks on R-is tähekombinatsioon `NA` (*Not Available*). Oletame, et analüüsil on vaja teada ka uuritavate vanust, teise vaatlusaluse kohta pole aga see teada:
+<!-- kuudes vanus-->
+```{r}
+vanused <- c(7, NA, 3, 53, 53, 95)
+vanused
+```
+Kui teha arvutusi puuduva väärtusega, siis tulemuseks on samuti puuduv väärtus. Proovi:
+```{r}
+123 + NA
+# vanuste vektor teisendada aastateks ja ümardada
+round(vanused/12, 1)
+```
+R-i funktsioonidel **võivad** olla lisaargumendid, mis reguleerivad puuduvate väärtusega toimetamist:
+```{r}
+mean(vanused) # keskmine vanus, kui kaasta NA väärtus on NA
+mean(vanused, na.rm = TRUE) # keskmine vanus, kui NA väärtus on eemaldatud
+table(vanused) # vanuste sagedustabel, NA väärtust ei esitata
+table(vanused, useNA = "ifany") # lisame sagedustabelisse ka puuduva väärtuse, kui esineb
+table(liik, useNA = "always") # lisame sagedustabelisse ka puuduva väärtuse, alati
+summary(vanused) # NA väärtuste arv tuuakse vaikimisi välja
+```
+
+
+### Ülesanded
+1. Kuidas käitub funktsioon `sum(.)` kui argumendiks satub puuduvate väärtustega vektor?
+1. Kas funktsioonil `which.min(.)` on lisaargument, mis reguleerib puuduvate väärtustega tegelemist?
+
+
+
 
 
