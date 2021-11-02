@@ -8,15 +8,15 @@ layout: frontpage
 
 ## Õppepäeva lühikirjeldus
 
-Õppepäeva eesmärk on tutvustada andmete analüüsimise praktilist käiku kahe näite varal. Alustame toorandmete analüüsiga, puhastame need ning vajadusel rikastame lisa andmeväljadega. Seejärel valime sobilikud andmeanalüüsimeetodid, et vastata meid huvitavatele küsimustele. Üldine eesmärk on andmete efektiivne kasutamine ehk kuidas saada andmetest praktilist kasu - Kuidas saada andmetest väärtuslikku teavet?
+Õppepäeva eesmärk on tutvustada andmete analüüsimise praktilist käiku kahe näite varal. Alustame toorandmete analüüsiga, puhastame need ning vajadusel rikastame lisa-andmeväljadega. Seejärel valime sobilikud andmeanalüüsimeetodid, et vastata meid huvitavatele küsimustele. Üldine eesmärk on andmete efektiivne kasutamine ehk kuidas saada andmetest praktilist kasu, kuidas saada andmetest väärtuslikku teavet.
 
-Koolituspäeva analüüsid saab iga osaleja paralleelselt koolitajaga järgi teha. Kasutame statistikatarkvara [R](https://cran.r-project.org/) ja [RStudiot](https://www.rstudio.com/products/rstudio/download/#download) (vabavaralised tarkvarad, vaja eelnevalt paigaldada). R-i näol on tegemist statistikute ja andmeanalüütikute ühe lemmiktarkvaraga, mis võimaldab teostada komplekseid andmetöötlust, andmeanalüüsi ja visualiseerimist.
+Koolituspäeva analüüsid saab iga osaleja paralleelselt koolitajaga järgi teha. Kasutame statistikatarkvara [R](https://cran.r-project.org/) ja [RStudiot](https://www.rstudio.com/products/rstudio/download/#download) (vabavaralised tarkvarad, vaja eelnevalt paigaldada). R-i näol on tegemist statistikute ja andmeanalüütikute ühe lemmiktarkvaraga, mis võimaldab teostada komplekset andmetöötlust, andmeanalüüsi ja visualiseerimist.
 
 ## Õppepäeva ülesehitus
 
 Koolitusprogramm koosneb kahest sessioonist ja koduülesannetest. Vt. täpset ajakava all.
 
-Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema on kokkuvõtlikult esitatud õppepäeva materjalides, teemas käsitleme meetodite töötamise põhimõtteid ja vaatame praktilisi näiteid, mis teeme läbi kõigile nähtavalt ja vastame küsimustele. Lahendamisel tekkinud probleemid lahendame kohapeal ja koos. Edasiste oskuste arendamiseks saab kasutada [lisamaterjale](lisamaterjal) (enamasti küll ingliskeelsed).
+Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema on kokkuvõtlikult esitatud õppepäeva materjalides, teemas käsitleme meetodite töötamise põhimõtteid ja vaatame praktilisi näiteid. Koolitaja teeb ekraanijagamise vahendusel näited läbi kõigile nähtavalt ja vastame jooksvalt tekkinud küsimustele. Edasiste oskuste arendamiseks saab kasutada [lisamaterjale](lisamaterjal) (enamasti küll ingliskeelsed).
 
 **Õppepäeva läbinud osaleja:**
 
@@ -24,7 +24,7 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 * oskab esmasel tasemel R-is andmeid sisse lugeda, töödelda ja salvestada,
 * teab klasterdamise ja aegridadeanalüüsi meetodite põhimõtteid,
 * oskab teostada lihtsamat andmeanalüüsi sildistamata andmetel (klasterdamine),
-* oskab teostada lihtsamat andmeanalüüsi järjestiku mõõtmiste korral.
+* oskab teostada lihtsamat andmeanalüüsi järjestiku mõõtmiste korral (aegread).
 
 
 ## Ajakava ja sisu 
