@@ -90,7 +90,7 @@ summary(jaemyyk)
 
 Kas neid väljavõtteid vaadates tekkis mõni küsimus, mida sooviks lähemalt uurida? Näiteks milline on numbriliste väljade jaotus? Mis riikidest on veebipoe kliendid pärit?
 
-Kui eelnevast ei piisanud võib andmeid edasi uurimiseks genereerida järgmise väga põhjaliku [raporti](report.html):
+Kui eelnevast ei piisanud võib andmeid edasi uurimiseks genereerida järgmise väga põhjaliku [raporti](http://htmlpreview.github.io/?https://github.com/rkursus/andmeanalyytik/blob/master/_teema1/report.html):
 
 ```{r eval = F}
 library(DataExplorer)
