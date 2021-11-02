@@ -39,11 +39,15 @@ plot(y)
 ```
 
 
-Järgnevalt hindame Holt-Winters’i mudeli. Sessoonsuse modelleerimisel kasutame multiplikatiivset mudelit – kas oskad aimata, miks?
+Järgnevalt hindame Holt-Winters’i mudeli. Hindame 
 
-```{r include=FALSE}
+* sesoonsust - kas eelmise aasta muster kordub aastast aastasse? Nt suvel on rohkem reisijaid, talvel vähem aga detsembris on jälle natuke suurem reisijate liikumine jõulude tõttu.
+* Trendi - kas ajas reisijate arv suureneb või väheneb stabiilselt?
+* Autoregressiivsust ehk kuidas mõjutab eelmine kuu käesolevat.
+* Iga üksiku kuu sesoonset mõju võrreldes keskmisega.
+
+```{r}
 m1=HoltWinters(y, seasonal="mult")
-m1
 ```
 
 
@@ -56,7 +60,7 @@ Kontrollime mudeli prognoosivõimet – kui hästi ta on varem suutnud tulevikku
 plot(m1)
 ```
 
-Prognoosime aga esmalt veendu, et sul oleks `forecast` pakett paigaldatud ja töömällu loetud:
+Prognoosime nüüd tulevikku aga esmalt veendu, et sul oleks `forecast` pakett paigaldatud ja töömällu loetud:
 ```{r eval = F}
 install.packages('forecast')
 library(forecast)
@@ -95,16 +99,26 @@ teg=ts(tegelik, start=c(2018, 4), frequency=12)
 points(teg, col="red", pch=20, cex=2)
 ```
 
+
+Veebruar-märts 2020 tabas Euroopat esimene COVID-19 laine ja paratamatult ei pea aegridade analüüs maailmat raputavate sündmuste puhul enam paika.
+
+```{r}
+prog = forecast(m1, h=36, level=0.95)
+plot(prog, xlim=c(2012, 2021), ylim = c(0,1.3)*10^6,
+     main="Tallinki reisijate arvu prognoos", 
+  	shadecols=c("gray95", "gray85", "gray80", "gray75") )
+tegelik=c(789272, 852609, 989445, 1223901, 993078, 730631, 785583, 
+			654240, 811261, 549278, 620006, 686488, 779113, 75511,280520, 617206,
+			453880, 243215, 162311, 158777, 141771, 121116, 74129, 71979, 84347,
+			124470, 218950, 444112, 389715, 310265)
+teg=ts(tegelik, start=c(2018, 4), frequency=12)
+points(teg, col="red", pch=20, cex=2)
+```
+
 Võid vaadata ka, kuidas erinevad aegrea komponendid (keskmine ilma sessoonsuse mõjuta; trend antud ajahetkel; sesoonsus antud ajahetkel) on ajas käitunud:
 
 ```{r}
 plot(fitted(m1))
-```
-
-Võid võrdluseks vaadelda ka seda, kuidas mõni teine meetod üritab aegrida komponentideks jagada:
-
-```{r}
-plot(stl(y, "per"))
 ```
 
 
@@ -128,6 +142,12 @@ prog = forecast(m2, h=10)
 plot(prog, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos")
 ```
 
+# STL mudelid ehk sesoonsus-trendi dekompositsioon
 
+STL ehk _Seasonal-Trend decomposition using LOESS_ on veel üks meetod, mis võimaldab aegridu analüüsida ja prognoosi leida. Võrdluseks vaatleme seda, kuidas STL meetod üritab aegrida komponentideks jagada:
+
+```{r}
+plot(stl(y, "per"))
+```
 
 
