@@ -53,12 +53,12 @@ Klientide segmenteerimiseks (või ükskõik milliste andmete lahterdamiseks) kas
 
 Näidis analüüsi tegemiseks kasutame vabalt kättesaadavat andmestikku [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/online+retail#) veebilehelt, mis on omakorda saanud andmed [Chen, Sain & Guo (2012)](https://link.springer.com/article/10.1057/dbm.2012.17) artiklist. 
 
-Andmesikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1. detsember 2010 - 9.  detsember 2011. Veebipoes müüakse enamasti igasugusteks puhkudeks kingitusi ja paljud veebipoe kliendid on jae- või hulgimüüjad. Veebipood tegutseb rahvusvaheliselt aga suur enamus klientuurist on pärit Suurbritanniast.
+Andmestikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1. detsember 2010 - 9.  detsember 2011. Veebipoes müüakse enamasti igasugusteks puhkudeks kingitusi ja paljud veebipoe kliendid on jae- või hulgimüüjad. Veebipood tegutseb rahvusvaheliselt aga suur enamus klientuurist on pärit Suurbritanniast.
 
 Andmestiku saate sisse laadida järgmise käsu abil:
 
 ```{r}
-library(readxl)
+# NB! pead ise määrama faili täpse asukoha failipuus
 jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
      col_types = c("text", "text", "text", 
           "numeric", "date", "numeric", "text", 
@@ -69,7 +69,7 @@ jaemyyk <- read_excel("../data/jaemyyk.xlsx",
 
 ## Andmeväljad ja andmestikuga tutvumine
 
-Kui andmestikuga kaasa tulnud tunnuste kirjeldused on järgmised:
+Andmestikuga kaasa tulnud tunnuste kirjeldused on järgmised:
 
 * `arve_nr` - Arve number. Nominaalne tunnus, 6-kohaline arv, mis on iga tehingu puhul unikaalne. Kui kood algab 'c' tähega, siis indikeerib see tühistatud tehingut.
 * `kood` - Toote või kauba kood. Nominaalne tunnus, 5-kohaline unikaalne number iga toote kohta.
@@ -123,7 +123,7 @@ summary(jaemyyk)
 
 ## Rikastame andmeid
 
-Esialgne andmestik ei pruugi kogu informatsiooni sisaldada, seega tuleks alati vaadata, kas saab uusi tunnuseid lisada, mis teevad analüüsi sisukamaks. Hetkel ei anna toote ühiku hind ja ostetud toote kogus piisavat infot kliendi käitumisest. Leiame ostu summa ja kuupäevad on alati hea infoallikas tegemaks keerukamaid analüüse - kuu vs kuu muutus, sessoonsus, tunnuste ajaline sõltuvus jpm.
+Esialgne andmestik ei pruugi kogu informatsiooni sisaldada, seega tuleks alati vaadata, kas saab uusi tunnuseid lisada, mis teevad analüüsi sisukamaks. Hetkel ei anna toote ühiku hind ja ostetud toote kogus piisavat infot kliendi käitumisest. Leiame nt ostu summa. Pidage meeles, et kuupäevad on alati hea infoallikas tegemaks keerukamaid analüüse - kuu vs kuu muutus, sessoonsus, tunnuste ajaline sõltuvus jpm.
 
 ```{r}
 # Rikastame andmeid
@@ -157,7 +157,7 @@ Näiteks olgu andmestikus pikkus, kaal ja sugu. Tekitades hajuvusdiagrammi ning 
 
 Nagu näha, siis eristuvad mehed ja naised üsna hästi kaalu ja pikkus järgi. Aga oletame, et me ei tea sugu ja proovime statistiliste meetodite abil hinnata, kas õnnestub antud andmestik jagada kaheks. 
 
-K-keskmiste klasterdamise puhul on eesmärk jagada objekti _k_ klastrisse nii, et iga objekt kuuluks klastrisse mille keskpunkt on talle kõige lähedam. Antud juhul _k_ = 2 ja nagu näha, siis õnnestus objektide gruppeerimine üsna sarnaselt sellele, mida indikeerib sugu.
+K-keskmiste klasterdamise puhul on eesmärk jagada objektid _k_ klastrisse nii, et iga objekt kuuluks klastrisse mille keskpunkt on talle kõige lähedam. Antud juhul _k_ = 2 ja nagu näha, siis õnnestus objektide gruppeerimine üsna sarnaselt sellele, mida indikeerib sugu.
 
 ![](pilt2.png)
 
@@ -169,7 +169,13 @@ Küll aga on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned 
 
 ## k-keskmiste klasterdamise ettevalmistused
 
-Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned esktreemsed väärtusd. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt `hist(kliendid$kaive`.
+Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned üksikud esktreemsed väärtusd. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt:
+
+
+```{r eval = F}
+hist(kliendid$kaive)
+```
+
 
 Kuna keskmised on tugevalt mõjutatud ekstreemsete väärtuste poolt, siis tuleb nende mõju vähendada. Selleks on erinevaid andmete transformeerimisviise - nt logaritmimine. 
 
@@ -191,7 +197,7 @@ hist(log(kliendid$kaive), xlab = 'Logaritmitud käive',
 
 Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
 
-Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
+Ühtlasi töötab _k_-keskmiste klasterdamine standardiseeritud (keskmine = 0 ja sd = 1) andmetega paremini. Seda saame teha käsuga `scale()`. Kohe kindlasti tuleb standardiseerida andmestikku kui tunnused on erinevate skaaladega (nt "pikkus sentimeetrites" skaala VS "laste arv perekonnas" skaala).
 
 Kogu eelneva saame tehtud järgmiste käskudega:
 
