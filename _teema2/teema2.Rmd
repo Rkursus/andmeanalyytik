@@ -24,7 +24,7 @@ Proovime leida Holt-Winters’i meetodil Tallinki reisijate arvu prognoosi.
 Loeme sisse näiteandmed:
 
 ```{r}
-load(url("http://www.ms.ut.ee/mart/andmeteadus/reisijaid.RData"))
+load(url("https://github.com/Rkursus/andmeanalyytik/raw/master/data/reisijaid.RData"))
 head(Tallink)
 attach(Tallink)
 ```
