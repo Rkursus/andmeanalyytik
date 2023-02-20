@@ -25,5 +25,5 @@ Teemade kinnistamiseks vaata läbi järgmised videod ja proovi järgi teha esime
 1. [Aegridade analüüs ja ennustamine](https://www.youtube.com/watch?v=AvG7czmeQfs)
 
 
-## [Lisa materjali](lisamaterjal)
+Teemade kinnistamiseks ning R-i oskuste lihvimiseks vaata ka [lisamaterjali](lisamaterjal)
 

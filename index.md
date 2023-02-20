@@ -20,7 +20,7 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 
 **Õppepäeva läbinud osaleja:**
 
-* teab mis etapid üldiselt eelnevad andmeanalüüsile,
+* teab mis etapid eelnevad andmeanalüüsile,
 * oskab esmasel tasemel R-is andmeid sisse lugeda, töödelda ja salvestada,
 * teab klasterdamise ja aegridadeanalüüsi meetodite põhimõtteid,
 * oskab teostada lihtsamat andmeanalüüsi sildistamata andmetel (klasterdamine),
@@ -34,9 +34,9 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 |10:00  | Avasõnad, sissejuhatus  |
 |10:15  |**Esimene sessioon** <br> * Näide klientide segmenteerimisest |
 |12:00 	|Lõunapaus	|
-|12:30	|**Teine sessioon** <br> * Tuleviku prognoosimine	|
-|14:15	|Sessioonide kokkuvõte, kodutöö tutvustus	|
-|14:30	|Õppepäeva lõpp |
+|12:15	|**Teine sessioon** <br> * Tuleviku prognoosimine	|
+|14:00	|Sessioonide kokkuvõte, kodutöö tutvustus	|
+|14:15	|Õppepäeva lõpp |
 
 
 ## Asjume asja kallale
@@ -48,7 +48,5 @@ Teemadele läheneme praktiliselt, _hands-on_	 põhimõttega - käsitletav teema 
 ![](pic.jpg)
 Kaur Lumiste<br>
 ---<br>
-Lektor [@UnitTartu](https://www.ut.ee)<br>
 Andmeteadlane [@Salv](https://www.salv.com)<br>
-kaur.lumiste [at] ut.ee <br>
 kaur [at] salv.com<br>

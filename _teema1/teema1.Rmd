@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Kui soovid koolitust oma arvutiga kaasa teha, siis esmalt paigalda Rstudios järgmised paketid. Vaikimisi seadistustega laetakse need sulle alla ja paigaldatakse automaatselt. Kuna mitmed paketid kasutavad veel omakorda lisapakette, siis võib juhtuda, et sinu arvutisse paigaldatakse palju rohkem pakette kui allolevas koodis kirjas.
 
 ```{r eval = F}
-install.pacakges('readxl')
+install.packages('readxl')
 install.packages('dplyr')
 install.packages('corrplot')
 
@@ -55,16 +55,29 @@ Näidis analüüsi tegemiseks kasutame vabalt kättesaadavat andmestikku [UCI Ma
 
 Andmestikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1. detsember 2010 - 9.  detsember 2011. Veebipoes müüakse enamasti igasugusteks puhkudeks kingitusi ja paljud veebipoe kliendid on jae- või hulgimüüjad. Veebipood tegutseb rahvusvaheliselt aga suur enamus klientuurist on pärit Suurbritanniast.
 
-Andmestiku saate sisse laadida järgmise käsu abil:
+Andmestiku saate sisse laadida järgmise käsu abil andes ette faili asukoha:
 
 ```{r}
 # NB! pead ise määrama faili täpse asukoha failipuus
-jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
+jaemyyk2 <- read_excel("../data/jaemyyk.xlsx", 
      col_types = c("text", "text", "text", 
           "numeric", "date", "numeric", "text", 
           "text"))
+```
 
+Või lihtsam variant lugeda sisse URLi kaudu (nõuab aga teist paketti):
 
+```{r eval=FALSE}
+# NB! peab teadma faili URLi
+install.packages('httr')
+library(httr)
+
+url = "https://github.com/Rkursus/andmeanalyytik/raw/master/data/jaemyyk.xlsx"
+GET(url, write_disk(file <- tempfile(fileext = ".xlsx")))
+jaemyyk <- read_excel(file, 
+     col_types = c("text", "text", "text", 
+          "numeric", "date", "numeric", "text", 
+          "text"))
 ```
 
 ## Andmeväljad ja andmestikuga tutvumine
@@ -161,15 +174,15 @@ K-keskmiste klasterdamise puhul on eesmärk jagada objektid _k_ klastrisse nii, 
 
 ![](pilt2.png)
 
-Suuruse _k_ saame ise määrata, näitek _k_ = 3 puhul oleks tuelmus järgmine:
+Suuruse _k_ saame ise määrata, näitek _k_ = 3 puhul oleks tulemus järgmine:
 
 ![](pilt3.png)
 
-Küll aga on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned ettevalmistused.
+Kui me ei tea gruppide arvu andmestikus, siis on võimalik määrata optimaalne gruppide arv _k_. Esmalt aga mõned ettevalmistused.
 
 ## k-keskmiste klasterdamise ettevalmistused
 
-Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned üksikud esktreemsed väärtusd. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt:
+Tunnused `kaive`, `tehinguid` ja `kesk_ost` on üsna eriskummaliste jaotustega. Neil kõigil on väga palju vaatlusi väikeste väärtustega ja "raskete sabadega" ehk mõned üksikud esktreemsed väärtused. Veendu selles eelnevalt räägitud raporti abil või jooksuta nt:
 
 
 ```{r eval = F}
@@ -240,7 +253,7 @@ Olles teinud ära kogu eeltöö saame lõpuks leida klientide grupid. Funktsioon
 
 ```{r}
 # Klasterdamer ja leiame klastrite keskmised (ehk keskpunkti)
-klastrid = kmeans(skaleeritud,4)
+klastrid = kmeans(skaleeritud, 4)
 klastrid$centers
 
 # Joonis, mis hõlbustab analüüsimist

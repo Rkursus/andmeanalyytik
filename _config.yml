@@ -5,7 +5,7 @@
 theme:            jekyll-theme-minimal
 
 # Setup
-title:            "7. õppepäev - Statistilised meetodid praktilises elus"
+title:            "6. õppepäev - Statistilised meetodid praktilises elus"
 tagline:          "Andmeanalüütiku arenguprogramm"
 url:              http://rkursus.github.io/
 paginate:         1
@@ -13,7 +13,7 @@ baseurl:          /andmeanalyytik
 author:
   name:           Kaur Lumiste
   url:            
-  email:          kaur.lumiste@ut.ee
+  email:          kaur@salv.com
 
 # Custom vars
 version:          1.0.0
