@@ -22,7 +22,7 @@ Teemade kinnistamiseks vaata läbi järgmised videod ja proovi järgi teha esime
 1. [Andmeanalüüsiks ettevalmistus](https://www.youtube.com/watch?v=zVImIQuqjQ0)
 	* Videos kasutatud andmestik - [šokolaadide reitingud](https://raw.githubusercontent.com/Rkursus/andmeanalyytik/master/data/flavors_of_cacao.csv)
 1. [Klasterdamine k-keskmiste meetod VS PAM](https://www.youtube.com/watch?v=KtRLF6rAkyo)
-1. [Aegridade analüüs ja ennustamine](https://www.youtube.com/watch?v=AvG7czmeQfs)
+1. Edasijõudnutele: [Intro: Aegridade analüüs ja ennustamine masinõppega](https://www.youtube.com/watch?v=AvG7czmeQfs)
 
 
 Teemade kinnistamiseks ning R-i oskuste lihvimiseks vaata ka [lisamaterjali](lisamaterjal)
