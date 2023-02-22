@@ -25,5 +25,5 @@ Teemade kinnistamiseks vaata läbi järgmised videod ja proovi järgi teha esime
 1. Edasijõudnutele: [Intro: Aegridade analüüs ja ennustamine masinõppega](https://www.youtube.com/watch?v=AvG7czmeQfs)
 
 
-Teemade kinnistamiseks ning R-i oskuste lihvimiseks vaata ka [lisamaterjali](lisamaterjal)
+Teemade kinnistamiseks ning R-i oskuste lihvimiseks vaata ka [lisamaterjali](lisamaterjal).
 
