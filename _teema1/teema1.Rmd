@@ -35,7 +35,7 @@ suppressWarnings(suppressPackageStartupMessages(library(corrplot)))
 ```{r eval = F, echo = F}
 # Töökausta seadistamine - 
 #    töökaustaks seatakse automaatselt kaust kus asub käesolev fail
-install.packages('rstudioapi')
+#install.packages('rstudioapi')
 setwd(dirname(rstudioapi::getActiveDocumentContext()[[2]]))
 ```
 
@@ -58,8 +58,8 @@ Andmestikus on Suurbritannias registreeritud veebipoe tehinguandmed vahemikus 1.
 Andmestiku saate sisse laadida järgmise käsu abil andes ette faili asukoha:
 
 ```{r}
-# NB! pead ise määrama faili täpse asukoha failipuus
-jaemyyk2 <- read_excel("../data/jaemyyk.xlsx", 
+# NB! pead ise määrama faili täpse asukoha failipuus või töökaustas
+jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
      col_types = c("text", "text", "text", 
           "numeric", "date", "numeric", "text", 
           "text"))
@@ -279,13 +279,29 @@ plot(kliendid$log_kaive, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20
      main = 'Käibe ja keskmise ostusumma hajuvusdiagramm')
 ```
 
+### Ülesanne nuputamiseks
+_Eelmiseid jooniseid on kohmakas vaadata, sest saame jooniseid teha vaid kahe tunnuse kaupa. Rakenda eelmisel õppepäeval õpitud multidimensionaalset skaleerimist._
+
+```{r eval=FALSE, echo=FALSE}
+library(MASS)
+d = dist(unique(skaleeritud))
+fit = isoMDS(d, k = 2)
+x = fit$
+y = fit$
+plot(x,y, col = klastrid$cluster, main = 'Multidimensionaalselt skaleeritud jaemyyk')
+```
+
+
+## Klastrite eraldamine
+
 Kui nüüd soovime teada millised kliendid kuuluvad teatud klastrisse (et siis vastavalt adresseerida või nt turundust suunata nendele), siis saame klientide ID-d eraldada järgmiste käskude abil:
 
 
 ```{r eval = F}
 kliendid$kliendi_id[klastrid$cluster == 1] # 1. klastrisse kuuluvad kliendid
 kliendid$kliendi_id[klastrid$cluster == 2] # 2. klastrisse kuuluvad kliendid
-# jne
+kliendid$kliendi_id[klastrid$cluster == 3] # 3. klastrisse kuuluvad kliendid
+kliendid$kliendi_id[klastrid$cluster == 4] # 4. klastrisse kuuluvad kliendid
 ```
 
 

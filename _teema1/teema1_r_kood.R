@@ -1,12 +1,12 @@
 # Andmeanalüütiku arenguprogramm
-# 7. õppepäev
+# 6. õppepäev
 # Statistilised meetodid praktilises elus
 #
 # Klientide segmenteerimine
 # Autor: Kaur Lumiste
 
 
-## Ettevalmistused
+## Ettevalmistused ----
 
 # Kui soovid koolitust oma arvutiga kaasa teha, siis esmalt paigalda Rstudios 
 #   järgmised paketid. 
@@ -19,8 +19,13 @@ library(readxl)
 library(dplyr)
 library(corrplot)
 
+# NIPP - Töökausta seadistamine - 
+#    töökaustaks seatakse automaatselt kaust kus asub käesolev fail
+#install.packages('rstudioapi')
+setwd(dirname(rstudioapi::getActiveDocumentContext()[[2]]))
 
-## Sissejuhatus
+
+## Sissejuhatus ----
 
 # Klientide segmenteerimiseks (või ükskõik milliste andmete lahterdamiseks) kasutame k-keskmiste meetodit (_k-means_). 
 #  Käime läbi järgmised etapid:
@@ -42,15 +47,27 @@ library(corrplot)
 #  ja paljud veebipoe kliendid on jae- või hulgimüüjad.
 
 # Andmestiku saate sisse laadida järgmise käsu abil:
-
+# NB! pead ise määrama faili täpse asukoha failipuus või töökaustas
 jaemyyk <- read_excel("../data/jaemyyk.xlsx", 
      col_types = c("text", "text", "text", 
           "numeric", "date", "numeric", "text", 
           "text"))
 
+# Või lihtsam variant lugeda sisse URLi kaudu (nõuab aga teist paketti):
+# NB! peab teadma faili URLi
+#install.packages('httr')
+library(httr)
+
+url = "https://github.com/Rkursus/andmeanalyytik/raw/master/data/jaemyyk.xlsx"
+GET(url, write_disk(file <- tempfile(fileext = ".xlsx")))
+jaemyyk <- read_excel(file, 
+                      col_types = c("text", "text", "text", 
+                                    "numeric", "date", "numeric", "text", 
+                                    "text"))
 
 
-## Andmeväljad ja andmestikuga tutvumine
+
+## Andmeväljad ja andmestikuga tutvumine ----
 
 # Kui andmestikuga kaasa tulnud tunnuste kirjeldused on järgmised:
 
@@ -76,7 +93,7 @@ DataExplorer::create_report(jaemyyk)
 
 
 
-## Andmete puhastamine
+## Andmete puhastamine ----
 
 jaemyyk <- jaemyyk %>% 
   filter(!is.na(kliendi_id), # tehingud millel puudub kliendi ID
@@ -89,7 +106,7 @@ jaemyyk <- jaemyyk %>%
 
 summary(jaemyyk)
 
-## Rikastame andmeid
+## Rikastame andmeid ----
 
 # Leiame ostu summa ja ostu sooritamise kuu
 jaemyyk <- jaemyyk %>% 
@@ -97,7 +114,7 @@ jaemyyk <- jaemyyk %>%
          ostukuu = months(ostu_kp))
 
 
-## Agregeerime klientide andmed
+## Agregeerime klientide andmed ----
 
 # Grupeerime andmed esmalt kliendi kaupa ja agregeerime
 kliendid <- jaemyyk %>% 
@@ -107,10 +124,11 @@ kliendid <- jaemyyk %>%
             kesk_ost = kaive / tehinguid)
 
 
-# Segmenteerimine k-keskmiste meetodi abil
+
+# Segmenteerimine k-keskmiste meetodi abil ----
 
 
-## k-keskmiste klasterdamise ettevalmistused
+## k-keskmiste klasterdamise ettevalmistused ----
 
 # Logaritm säilitab väärtuste järekorra ja hiljem kui on vaja tõlgendada, 
 #  siis saame kasutada pöördfunktsiooni ehk eksponenti `exp()`.
@@ -126,7 +144,7 @@ skaleeritud <- kliendid %>%
   scale() 
 
 
-## Klastrite arvu _k_ määramine
+## Klastrite arvu _k_ määramine ----
 
 # Kasutame nn. "küünarnuki" meetodit (_elbow method_). 
 # Eelnevad suurused, mis on vaja defineerida
@@ -145,7 +163,7 @@ plot(k,pr,type="b")
 
 
 
-## Klientide segmenteerimine
+## Klientide segmenteerimine ----
 
 
 # Klasterdamer ja leiame klastrite keskmised (ehk keskpunkti)
@@ -172,6 +190,11 @@ plot(kliendid$log_kaive, kliendid$log_kesk_ost, col = klastrid$cluster, pch = 20
      xlab = 'Käive',
      ylab = 'Keskmine ostusumma',
      main = 'Käibe ja keskmise ostusumma hajuvusdiagramm')
+
+### Ülesanne nuputamiseks
+# Eelmiseid jooniseid on kohmakas vaadata, sest saame jooniseid teha vaid kahe tunnuse kaupa. 
+#  Rakenda eelmisel õppepäeval õpitud multidimensionaalset skaleerimist (isoMDS).
+
 
 
 # Kui nüüd soovime teada millised kliendid kuuluvad teatud klastrisse 
