@@ -122,6 +122,19 @@ y2 = ts(append(reisijaid, tegelik), start=c(2012,5), frequency=12)
 # Milliseid otsuseid teeksid kui näeksid sellist prognoosi? Kas ostaksid Tallinki aktsiaid?
 
 
+## ARIMA mudelid
+
+# On veel mudeleid, mille abil on võimalik aegrea struktuuri esitada, näiteks ARIMA mudelid. 
+#  ARIMA ehk _AutoRegressive Integrated Moving Average_ proovib samamoodi aegrea 
+#  komponentideks lahti lõhkuda autoregressiivse strutuuri abil.
+
+# R-is on kindel abimees funktsioon `auto.arima()`
+y = ts(reisijaid, start=c(2012,5), frequency=12)
+m2 = auto.arima(y)
+prog2 = forecast(m2, h=10)
+plot(prog2, xlim=c(2012, 2020), main="Tallinki reisijate arvu prognoos")
+
+# Võrdle tulemusi Holt-Winters mudeliga.
 
 
 
