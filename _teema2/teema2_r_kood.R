@@ -82,6 +82,24 @@ tegelik=c(789272, 852609, 989445, 1223901, 993078, 730631, 785583,
 teg=ts(tegelik, start=c(2018, 4), frequency=12)
 points(teg, col="red", cex=1.2, pch=20)
 
+# Veebruar-märts 2020 tabas Euroopat esimene COVID-19 laine ja paratamatult 
+#  ei pea aegridade analüüs maailmat raputavate sündmuste puhul enam paika.
+#  Veendu selles ise:
+
+prog = forecast(m1, h=60, level=0.95)
+plot(prog, xlim=c(2012, 2023), ylim = c(0,1.3)*10^6,
+     main="Tallinki reisijate arvu prognoos", 
+     shadecols=c("gray95", "gray85", "gray80", "gray75") )
+tegelik=c(789272, 852609, 989445, 1223901, 993078, 730631, 785583, 
+          654240, 811261, 549278, 620006, 686488, 779113, 853309, 1019421,
+          1238871, 1017565, 718354, 800828, 698293, 781684, 617374, 669849, 
+          279507, 32181, 75511, 280520, 617206, 453880, 243215, 162311, 158777, 
+          141771, 121116, 74129, 71979, 84347, 124470, 218950, 444112,389715, 
+          310265, 412046, 351857, 358989, 181687, 235214, 303360, 465945, 
+          485741, 600488, 897828, 603284, 392491, 454207, 378540, 463300, 338194)
+teg=ts(tegelik, start=c(2018, 4), frequency=12)
+lines(teg, col = "red", cex = 3)
+
 
 ### Ülesanne nuputamiseks
 
